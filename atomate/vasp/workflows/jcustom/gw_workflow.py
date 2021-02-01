@@ -36,7 +36,7 @@ def gw_wf(structure,prev_dir, ncores, vis_static=None, vasp_input_set_params=Non
                       vasp_input_set_params={"user_incar_settings": {"LWAVE": False, "LCHARG":False}},
                       mode="BSE", name="gw_bse")
 
-    fws.append(static_fw)
+    # fws.append(static_fw)
     fws.append(diag_fw)
     fws.append(gw_fw)
     fws.append(bse_fw)
