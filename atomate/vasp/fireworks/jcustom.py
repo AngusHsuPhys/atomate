@@ -207,7 +207,7 @@ class JMVLGWFW(Firework):
             self,
             structure,
             mode,
-            name="J MVLGW",
+            name="GW",
 
             prev_incar=None,
             nbands=None,

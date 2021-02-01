@@ -11,18 +11,18 @@ from fireworks import Firework, LaunchPad, Workflow
 import numpy as np
 
 
-def gw_wf(structure, ncores, vis_static=None, vasp_input_set_params=None, vasptodb=None, wf_addition_name=None):
+def gw_wf(structure,prev_dir, ncores, vis_static=None, vasp_input_set_params=None, vasptodb=None, wf_addition_name=None):
     fws = []
     # 1. STATIC
-    static_fw = StaticFW(
-        structure,
-        vasp_input_set=vis_static,
-        vasp_input_set_params={"force_gamma": True,
-                               "user_incar_settings":{"EDIFF": 1E-8, "LWAVE":True, "LAECHG": False, "LCHARG":False}},
-        name="gw_static") #ediff=1e-4
+    # static_fw = StaticFW(
+    #     structure,
+    #     vasp_input_set=vis_static,
+    #     vasp_input_set_params={"force_gamma": True,
+    #                            "user_incar_settings":{"EDIFF": 1E-5, "LWAVE":True, "LAECHG": False, "LCHARG":False}},
+    #     name="gw_static") #ediff=1e-4
 
     # 2. DIAG
-    diag_fw = JMVLGWFW(structure, ncores=ncores, parents=static_fw,
+    diag_fw = JMVLGWFW(structure, ncores=ncores, parents=static_fw, prev_calc_dir=prev_dir,
                        vasp_input_set_params={"user_incar_settings": {"LWAVE": True, "LCHARG":False}},
                        mode="DIAG", name="gw_diag")
 
