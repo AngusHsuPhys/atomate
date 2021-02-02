@@ -11,7 +11,7 @@ from fireworks import Firework, LaunchPad, Workflow
 import numpy as np
 
 
-def gw_wf(structure,prev_dir, ncores, vis_static=None, vasp_input_set_params=None, vasptodb=None, wf_addition_name=None):
+def gw_wf(structure,prev_dir, ncores, nbands_factor, vis_static=None, vasp_input_set_params=None, vasptodb=None, wf_addition_name=None):
     fws = []
     # 1. STATIC
     # static_fw = StaticFW(
@@ -24,17 +24,17 @@ def gw_wf(structure,prev_dir, ncores, vis_static=None, vasp_input_set_params=Non
     # 2. DIAG
     diag_fw = JMVLGWFW(structure, ncores=ncores, prev_calc_dir=prev_dir, vasp_cmd=">>vasp_ncl<<",
                        vasp_input_set_params={"user_incar_settings": {"LWAVE": True, "LCHARG":False}},
-                       mode="DIAG", name="gw_diag")
+                       mode="DIAG", name="gw_diag", nbands_factor=nbands_factor)
 
     # 3. GW
     gw_fw = JMVLGWFW(structure, ncores=ncores, parents=diag_fw, vasp_cmd=">>vasp_ncl<<",
                      vasp_input_set_params={"user_incar_settings": {"LWAVE": True, "LCHARG":False}},
-                     mode="GW", name="gw_gw")
+                     mode="GW", name="gw_gw", nbands_factor=nbands_factor)
 
     # 4. BSE
     bse_fw = JMVLGWFW(structure, ncores=ncores, parents=gw_fw, vasp_cmd=">>vasp_ncl<<",
                       vasp_input_set_params={"user_incar_settings": {"LWAVE": False, "LCHARG":False}},
-                      mode="BSE", name="gw_bse")
+                      mode="BSE", name="gw_bse", nbands_factor=nbands_factor)
 
     # fws.append(static_fw)
     fws.append(diag_fw)
