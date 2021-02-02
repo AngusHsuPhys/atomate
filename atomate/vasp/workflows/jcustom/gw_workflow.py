@@ -22,17 +22,17 @@ def gw_wf(structure,prev_dir, ncores, vis_static=None, vasp_input_set_params=Non
     #     name="gw_static") #ediff=1e-4
 
     # 2. DIAG
-    diag_fw = JMVLGWFW(structure, ncores=ncores, prev_calc_dir=prev_dir,
+    diag_fw = JMVLGWFW(structure, ncores=ncores, prev_calc_dir=prev_dir, vasp_cmd=">>vasp_ncl<<",
                        vasp_input_set_params={"user_incar_settings": {"LWAVE": True, "LCHARG":False}},
                        mode="DIAG", name="gw_diag")
 
     # 3. GW
-    gw_fw = JMVLGWFW(structure, ncores=ncores, parents=diag_fw,
+    gw_fw = JMVLGWFW(structure, ncores=ncores, parents=diag_fw, vasp_cmd=">>vasp_ncl<<",
                      vasp_input_set_params={"user_incar_settings": {"LWAVE": True, "LCHARG":False}},
                      mode="GW", name="gw_gw")
 
     # 4. BSE
-    bse_fw = JMVLGWFW(structure, ncores=ncores, parents=gw_fw,
+    bse_fw = JMVLGWFW(structure, ncores=ncores, parents=gw_fw, vasp_cmd=">>vasp_ncl<<",
                       vasp_input_set_params={"user_incar_settings": {"LWAVE": False, "LCHARG":False}},
                       mode="BSE", name="gw_bse")
 
@@ -45,7 +45,6 @@ def gw_wf(structure,prev_dir, ncores, vis_static=None, vasp_input_set_params=Non
     wf = Workflow(fws, name=wf_name)
     vasptodb.update({"wf": [fw.name for fw in wf.fws]})
     wf = add_additional_fields_to_taskdocs(wf, vasptodb)
-    wf = add_modify_incar(wf, {"incar_update": {"MAGMOM": MPRelaxSet(structure).incar.get("MAGMOM", None)}})
     wf = add_namefile(wf)
     wf = add_modify_incar(wf)
     return wf
