@@ -129,6 +129,7 @@ def jmodify_to_soc(
             "SAXIS": saxis,
             "MAGMOM": magmom,
             "ISPIN": 2,
+            "ICHARG":11,
             # "LMAXMIX": 4,
             "ISYM": -1,
         }
