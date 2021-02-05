@@ -136,7 +136,7 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, scf_dos, n
 
         uis_hse_scf["user_incar_settings"].update({"NELECT": nelect})
 
-        def hse_scf(parents, soc=False, prev_calc_dir=None):
+        def hse_scf(parents, prev_calc_dir=None, lcharge=False):
             parse_dos = False
             bandstructure_mode = False
             if scf_dos:
@@ -144,8 +144,8 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, scf_dos, n
                 parse_dos = True
                 bandstructure_mode = "uniform"
 
-            if soc:
-                uis_hse_scf["user_incar_settings"].update({"LWAVE":True, "LCHARG":True})
+            if lcharge:
+                uis_hse_scf["user_incar_settings"].update({"LCHARG":True})
 
             fw = JHSEStaticFW(
                 structure,
@@ -208,7 +208,7 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, scf_dos, n
                 input_set_overrides={"other_params": {"two_d_kpoints": True,
                                                       "user_incar_settings":uis_hse_scf["user_incar_settings"],
                                                       },
-                                     # "kpoints_line_density": 20
+                                     "kpoints_line_density": 20
                                      },
                 cp_file_from_prev="CHGCAR",
                 prev_calc_dir=prev_calc_dir,
@@ -231,7 +231,7 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, scf_dos, n
             fws.append(hse_scf(parents=None))
             fws.append(hse_bs(parents=fws[-1], **task_arg))
         elif task == "hse_scf-hse_soc":
-            fws.append(hse_scf(parents=None, soc=True, **task_arg))
+            fws.append(hse_scf(parents=None, lcharge=True, **task_arg))
             fws.append(hse_soc(parents=fws[-1]))
         elif task == "hse_relax-hse_scf":
             fws.append(hse_relax(parents=None))
@@ -242,11 +242,11 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, scf_dos, n
             fws.append(hse_scf(parents=fws[-1]))
         elif task == "hse_relax-hse_scf-hse_bs":
             fws.append(hse_relax(parents=None))
-            fws.append(hse_scf(parents=fws[-1]))
+            fws.append(hse_scf(parents=fws[-1], lcharge=True))
             fws.append(hse_bs(parents=fws[-1], **task_arg))
         elif task == "hse_relax-hse_scf-hse_soc":
             fws.append(hse_relax(parents=None))
-            fws.append(hse_scf(parents=fws[-1], soc=True))
+            fws.append(hse_scf(parents=fws[-1], lcharge=True))
             fws.append(hse_soc(parents=fws[-1]))
         elif task == "opt-hse_relax-hse_scf-hse_bs":
             fws.append(opt)
