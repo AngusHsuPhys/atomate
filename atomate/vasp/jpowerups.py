@@ -80,7 +80,7 @@ def write_inputs_from_db(original_wf, db_file, task_id, modify_incar, write_chgc
 
 def jmodify_to_soc(
             original_wf,
-            nbands,
+            nbands=None,
             saxis=[0,0,1],
             magmom=None,
             structure=None,
@@ -127,13 +127,15 @@ def jmodify_to_soc(
         "incar_update": {
             "LSORBIT": "T",
             "SAXIS": saxis,
-            "NBANDS": nbands,
             "MAGMOM": magmom,
             "ISPIN": 2,
             # "LMAXMIX": 4,
             "ISYM": -1,
         }
     }
+    if nbands:
+        modify_incar_soc["incar_update"].update({"NBANDS": nbands})
+
     if modify_incar_params:
         modify_incar_soc["incar_update"].update(modify_incar_params)
 
