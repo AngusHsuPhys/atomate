@@ -131,7 +131,7 @@ def jmodify_to_soc(
             "ISPIN": 2,
             "ICHARG":11,
             # "LMAXMIX": 4,
-            "ISYM": -1,
+            "ISYM": 0,
         }
     }
     if nbands:
