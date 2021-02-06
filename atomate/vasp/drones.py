@@ -86,7 +86,7 @@ class VaspDrone(AbstractDrone):
 
     def __init__(self, runs=None, parse_dos="auto", bandstructure_mode="auto",
                  parse_locpot=True, additional_fields=None, use_full_uri=True,
-                 parse_bader=bader_exe_exists, parse_chgcar=False, parse_aeccar=False,
+                 parse_bader=False, parse_chgcar=False, parse_aeccar=False,
                  parse_wavecar=False,
                  parse_eigenvalues=False,
                  parse_potcar_file=True,
