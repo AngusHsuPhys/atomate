@@ -179,7 +179,7 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, scf_dos, n
                 prev_calc_dir=prev_calc_dir,
                 structure=structure,
                 read_chgcar=True,
-                read_wavecar=True,
+                read_wavecar=False,
                 name="HSE_soc",
                 saxis=(0, 0, 1),
                 parents=parents,
