@@ -136,7 +136,7 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, scf_dos, n
 
         uis_hse_scf["user_incar_settings"].update({"NELECT": nelect})
 
-        def hse_scf(parents, prev_calc_dir=None, lcharge=False):
+        def hse_scf(parents, prev_calc_dir=None, lcharg=False):
             parse_dos = False
             bandstructure_mode = False
             if scf_dos:
@@ -144,7 +144,7 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, scf_dos, n
                 parse_dos = True
                 bandstructure_mode = "uniform"
 
-            if lcharge:
+            if lcharg:
                 uis_hse_scf["user_incar_settings"].update({"LCHARG":True})
 
             fw = JHSEStaticFW(
