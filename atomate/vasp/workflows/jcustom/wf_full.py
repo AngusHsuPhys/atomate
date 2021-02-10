@@ -12,7 +12,7 @@ from fireworks import Firework, LaunchPad, Workflow
 import numpy as np
 
 
-def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, scf_dos, nupdowns, task, category,
+def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, scf_dos, nupdowns, task,
                     vasptodb=None, wf_addition_name=None, task_arg=None):
 
     encut = 1.3*max([potcar.enmax for potcar in MPHSERelaxSet(structure).potcar])
@@ -262,10 +262,7 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, scf_dos, n
 
     vasptodb.update({"wf": [fw.name for fw in wf.fws]})
     wf = add_additional_fields_to_taskdocs(wf, vasptodb)
-    wf = add_modify_incar(wf)
-    wf = preserve_fworker(wf)
     wf = add_namefile(wf)
-    wf = set_execution_options(wf, category=category)
     return wf
 
 
