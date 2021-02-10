@@ -236,11 +236,11 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, scf_dos, n
             fws.append(hse_soc(parents=fws[-1]))
         elif task == "hse_relax-hse_scf":
             fws.append(hse_relax(parents=None))
-            fws.append(hse_scf(fws[-1]))
+            fws.append(hse_scf(fws[-1], **task_arg))
         elif task == "opt-hse_relax-hse_scf":
             fws.append(opt)
             fws.append(hse_relax(parents=fws[-1]))
-            fws.append(hse_scf(parents=fws[-1]))
+            fws.append(hse_scf(parents=fws[-1], **task_arg))
         elif task == "hse_relax-hse_scf-hse_bs":
             fws.append(hse_relax(parents=None))
             fws.append(hse_scf(parents=fws[-1], lcharge=True))

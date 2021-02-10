@@ -608,7 +608,9 @@ class JHSESOCFW(Firework):
         elif parents and copy_vasp_outputs:
             t.append(
                 CopyVaspOutputs(
-                    calc_loc=True, additional_files=copy_add_files_from_prev, contcar_to_poscar=True
+                    calc_loc=True,
+                    additional_files=copy_add_files_from_prev,
+                    contcar_to_poscar=True
                 )
             )
             t.append(
