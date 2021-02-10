@@ -143,6 +143,7 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, scf_dos, n
                 uis_hse_scf["user_incar_settings"].update({"ENMAX": 10, "ENMIN": -10, "NEDOS": 9000})
                 parse_dos = True
                 bandstructure_mode = "uniform"
+
             if lcharge:
                 uis_hse_scf["user_incar_settings"].update({"LCHARG":True})
 
