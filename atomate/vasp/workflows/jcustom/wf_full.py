@@ -136,12 +136,9 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, scf_dos, n
 
         uis_hse_scf["user_incar_settings"].update({"NELECT": nelect})
 
-        def hse_scf(parents, prev_calc_dir=None, lcharg=False):
-            parse_dos = False
-            bandstructure_mode = False
-            if scf_dos:
+        def hse_scf(parents, prev_calc_dir=None, lcharg=False, parse_dos=True, parse_eigenvalues=True):
+            if parse_dos:
                 uis_hse_scf["user_incar_settings"].update({"ENMAX": 10, "ENMIN": -10, "NEDOS": 9000})
-                parse_dos = True
                 bandstructure_mode = "uniform"
 
             if lcharg:
@@ -161,25 +158,24 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, scf_dos, n
                         "nupdown_set": nupdown
                     },
                     "parse_dos": parse_dos,
-                    "parse_eigenvalues": False,
+                    "parse_eigenvalues": parse_eigenvalues,
                     "bandstructure_mode": bandstructure_mode
                 }
             )
             return fw
 
-        def hse_soc(parents, prev_calc_dir=None):
-            parse_dos = False
-            bandstructure_mode = False
-            if scf_dos:
+        def hse_soc(parents, prev_calc_dir=None, parse_dos=True,
+                    parse_eigenvalues=True, read_chgcar=True, read_wavecar=False):
+
+            if parse_dos:
                 uis_hse_scf["user_incar_settings"].update({"ENMAX": 10, "ENMIN": -10, "NEDOS": 9000})
-                parse_dos = True
                 bandstructure_mode = "uniform"
 
             fw = JHSESOCFW(
                 prev_calc_dir=prev_calc_dir,
                 structure=structure,
-                read_chgcar=True,
-                read_wavecar=False,
+                read_chgcar=read_chgcar,
+                read_wavecar=read_wavecar,
                 name="HSE_soc",
                 saxis=(0, 0, 1),
                 parents=parents,
@@ -192,7 +188,7 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, scf_dos, n
                     },
 
                     "parse_dos": parse_dos,
-                    "parse_eigenvalues": True,
+                    "parse_eigenvalues": parse_eigenvalues,
                     "bandstructure_mode": bandstructure_mode
                 }
             )
