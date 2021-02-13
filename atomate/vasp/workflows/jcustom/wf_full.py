@@ -12,7 +12,7 @@ from fireworks import Firework, LaunchPad, Workflow
 import numpy as np
 
 
-def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, scf_dos, nupdowns, task,
+def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, nupdowns, task,
                     vasptodb=None, wf_addition_name=None, task_arg=None):
 
     encut = 1.3*max([potcar.enmax for potcar in MPHSERelaxSet(structure).potcar])
