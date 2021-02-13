@@ -35,7 +35,7 @@ def scp_files(
         original_wf,
         dest,
         fw_name_constraint=None,
-        task_name_constraint="RunVasp",
+        task_name_constraint="VaspToDb",
 ):
     """
     SCP ALL files to local computer
