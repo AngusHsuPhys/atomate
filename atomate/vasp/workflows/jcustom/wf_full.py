@@ -165,7 +165,7 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, nupdowns, 
             return fw
 
         def hse_soc(parents, prev_calc_dir=None, parse_dos=True,
-                    parse_eigenvalues=True, read_chgcar=True, read_wavecar=False):
+                    parse_eigenvalues=True, read_chgcar=True, read_wavecar=False, saxis=(0,0,1)):
 
             if parse_dos:
                 uis_hse_scf["user_incar_settings"].update({"ENMAX": 10, "ENMIN": -10, "NEDOS": 9000})
@@ -177,7 +177,7 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, nupdowns, 
                 read_chgcar=read_chgcar,
                 read_wavecar=read_wavecar,
                 name="HSE_soc",
-                saxis=(0, 0, 1),
+                saxis=saxis,
                 parents=parents,
                 vasp_input_set_params=uis_hse_scf,
                 vasptodb_kwargs={
