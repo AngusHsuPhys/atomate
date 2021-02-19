@@ -80,10 +80,10 @@ def write_inputs_from_db(original_wf, db_file, task_id, modify_incar, write_chgc
 
 def jmodify_to_soc(
             original_wf,
+            structure,
             nbands=None,
             saxis=[0,0,1],
             magmom=None,
-            structure=None,
             modify_incar_params=None,
             fw_name_constraint=None,
     ):
