@@ -5,6 +5,7 @@ from atomate.vasp.config import (
     SCRATCH_DIR,
     ADD_MODIFY_INCAR,
     GAMMA_VASP_CMD,
+    VDW_KERNEL_DIR
 )
 from atomate.vasp.firetasks.jcustom import JFileTransferTask, JWriteInputsFromDB
 from atomate.vasp.firetasks.glue_tasks import CheckStability, CheckBandgap
@@ -202,7 +203,7 @@ def write_PMGObjects(original_wf, pmg_objs, fw_name_constraint=None):
         )
     return original_wf
 
-def cp_vdw_file(original_wf, vdw_kernel_dir, fw_name_constraint=None):
+def cp_vdw_file(original_wf, fw_name_constraint=None):
 
     idx_list = get_fws_and_tasks(
         original_wf,
@@ -212,6 +213,6 @@ def cp_vdw_file(original_wf, vdw_kernel_dir, fw_name_constraint=None):
 
     for idx_fw, idx_t in idx_list:
         original_wf.fws[idx_fw].tasks.insert(
-            idx_t-1, CopyFiles(from_dir=vdw_kernel_dir)
+            idx_t-1, CopyFiles(from_dir=VDW_KERNEL_DIR)
         )
     return original_wf
