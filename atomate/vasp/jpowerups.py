@@ -8,7 +8,7 @@ from atomate.vasp.config import (
     VDW_KERNEL_DIR
 )
 from atomate.vasp.firetasks.jcustom import JFileTransferTask, JWriteInputsFromDB
-from atomate.vasp.firetasks.glue_tasks import CheckStability, CheckBandgap
+from atomate.vasp.firetasks.glue_tasks import CheckStability, CheckBandgap, CopyFiles
 from atomate.vasp.firetasks.lobster_tasks import RunLobsterFake
 from atomate.vasp.firetasks.neb_tasks import RunNEBVaspFake
 from atomate.vasp.firetasks.parse_outputs import JsonToDb
@@ -19,6 +19,7 @@ from atomate.vasp.firetasks.run_calc import (
     RunNoVasp,
 )
 from atomate.vasp.firetasks.write_inputs import ModifyIncar, ModifyPotcar, ModifyKpoints, WriteVaspFromPMGObjects
+
 from fireworks import Workflow, FileWriteTask
 from fireworks.core.firework import Tracker
 from fireworks.utilities.fw_utilities import get_slug
