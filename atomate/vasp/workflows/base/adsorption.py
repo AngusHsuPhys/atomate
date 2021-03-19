@@ -322,7 +322,11 @@ class MPSurfaceSet(MVLSlabSet):
         # This is a hack, but should be fixed when this is ported over to
         # pymatgen to account for vasp native dipole fix
         if auto_dipole:
-            self._config_dict['INCAR'].update({"LDIPOL": True, "IDIPOL": 3})
+            weights = [s.species.weight for s in structure]
+            center_of_mass = np.average(
+                structure.frac_coords, weights=weights, axis=0
+            )
+            self._config_dict['INCAR'].update({"LDIPOL": True, "IDIPOL": 3, "DIPOL": center_of_mass})
             self.auto_dipole = True
 
     @property
