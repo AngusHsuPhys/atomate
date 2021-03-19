@@ -11,6 +11,7 @@ from fireworks import Workflow
 
 from atomate.vasp.fireworks.core import OptimizeFW, TransmuterFW
 from atomate.utils.utils import get_meta_from_structure
+from atomate.vasp.powerups import *
 
 from pymatgen.analysis.adsorption import AdsorbateSiteFinder
 from pymatgen.core.surface import generate_all_slabs, Slab
@@ -250,12 +251,15 @@ def get_wf_molecules(molecules, vasp_input_set=None, db_file=None,
         # molecule in box
         m_struct = molecule.get_boxed_structure(10, 10, 10,
                                                 offset=np.array([5, 5, 5]))
-        vis = vasp_input_set or MPSurfaceSet(m_struct)
+        vis = vasp_input_set or MPSurfaceSet(m_struct, bulk=True)
         fws.append(OptimizeFW(structure=molecule, job_type="normal",
                               vasp_input_set=vis, db_file=db_file,
                               vasp_cmd=vasp_cmd))
+
     name = name or "molecules workflow"
-    return Workflow(fws, name=name)
+    wf = Workflow(fws, name=name)
+    wf = ModifyKpoints(wf, {"kpoints_update": {"kpts": ((1,1,1),)}})
+    return wf
 
 
 # TODO: this will duplicate a precursor optimization for slabs with
