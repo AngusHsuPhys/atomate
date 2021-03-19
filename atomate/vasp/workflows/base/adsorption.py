@@ -25,8 +25,8 @@ __email__ = 'montoyjh@lbl.gov'
 
 # TODO: Add functionality for reconstructions
 # TODO: Add framework for including vibrations and free energy
-def get_slab_fw(slab, transmuter=False, db_file=None, vasp_input_set=None,
-                parents=None, vasp_cmd="vasp", name="", add_slab_metadata=True):
+def get_slab_fw(slab, transmuter=False, db_file=">>db_file<<", vasp_input_set=None,
+                parents=None, vasp_cmd=">>vasp_cmd<<", name="", add_slab_metadata=True):
     """
     Function to generate a a slab firework.  Returns a TransmuterFW if
     bulk_structure is specified, constructing the necessary transformations
@@ -157,7 +157,7 @@ def get_slab_trans_params(slab):
 
 def get_wf_slab(slab, include_bulk_opt=False, adsorbates=None,
                 ads_structures_params=None, vasp_cmd=">>vasp_cmd<<",
-                db_file=None, add_molecules_in_box=False):
+                db_file=">>db_file<<", add_molecules_in_box=False):
     """
     Gets a workflow corresponding to a slab calculation along with optional
     adsorbate calcs and precursor oriented unit cell optimization
@@ -232,8 +232,8 @@ def get_wf_slab(slab, include_bulk_opt=False, adsorbates=None,
     return wf
 
 
-def get_wf_molecules(molecules, vasp_input_set=None, db_file=None,
-                     vasp_cmd="vasp", name=""):
+def get_wf_molecules(molecules, vasp_input_set=None, db_file=">>db_file<<",
+                     vasp_cmd=">>vasp_cmd<<", name=""):
     """
     Args:
         molecules (Molecules): list of molecules to calculate
@@ -266,8 +266,8 @@ def get_wf_molecules(molecules, vasp_input_set=None, db_file=None,
 #       the same miller index, but different shift
 def get_wfs_all_slabs(bulk_structure, include_bulk_opt=False,
                       adsorbates=None, max_index=1, slab_gen_params=None,
-                      ads_structures_params=None, vasp_cmd="vasp",
-                      db_file=None, add_molecules_in_box=False):
+                      ads_structures_params=None, vasp_cmd=">>vasp_cmd<<",
+                      db_file=">>db_file<<", add_molecules_in_box=False):
     """
     Convenience constructor that allows a user to construct a workflow
     that finds all adsorption configurations (or slabs) for a given
