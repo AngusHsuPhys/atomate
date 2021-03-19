@@ -312,12 +312,13 @@ class MPSurfaceSet(MVLSlabSet):
     Input class for MP slab calcs, mostly to change parameters
     and defaults slightly
     """
-    def __init__(self, structure, bulk=False, auto_dipole=None, **kwargs):
+    def __init__(self, structure, bulk=False, auto_dipole=None, set_mix=False, **kwargs):
 
         # If not a bulk calc, turn get_locpot/auto_dipole on by default
+
         auto_dipole = auto_dipole or not bulk
         super(MPSurfaceSet, self).__init__(
-            structure, bulk=bulk, auto_dipole=False, **kwargs)
+            structure, bulk=bulk, auto_dipole=False, set_mix=set_mix, **kwargs)
         # This is a hack, but should be fixed when this is ported over to
         # pymatgen to account for vasp native dipole fix
         if auto_dipole:
