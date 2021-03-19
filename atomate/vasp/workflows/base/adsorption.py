@@ -258,7 +258,7 @@ def get_wf_molecules(molecules, vasp_input_set=None, db_file=None,
 
     name = name or "molecules workflow"
     wf = Workflow(fws, name=name)
-    wf = ModifyKpoints(wf, {"kpoints_update": {"kpts": ((1,1,1),)}})
+    wf = add_modify_kpoints(wf, {"kpoints_update": {"kpts": ((1,1,1),)}})
     return wf
 
 
