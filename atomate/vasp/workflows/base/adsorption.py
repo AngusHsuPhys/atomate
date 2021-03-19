@@ -50,7 +50,7 @@ def get_slab_fw(slab, transmuter=False, db_file=">>db_file<<", vasp_input_set=No
     Returns:
         Firework corresponding to slab calculation
     """
-    vasp_input_set = vasp_input_set or MPSurfaceSet(slab, bulk=False, auto_dipole=None, set_mix=False)
+    vasp_input_set = vasp_input_set or MPSurfaceSet(sort_structure=lab, bulk=False, auto_dipole=None, set_mix=False)
 
     # If a bulk_structure is specified, generate the set of transformations,
     # else just create an optimize FW with the slab
