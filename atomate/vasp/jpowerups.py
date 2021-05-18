@@ -217,3 +217,16 @@ def cp_vdw_file(original_wf, fw_name_constraint=None):
             idx_t-1, CopyFiles(from_dir=VDW_KERNEL_DIR)
         )
     return original_wf
+
+def cp_vasp_from_prev(original_wf, vasp_io, fw_name_constraint=None):
+    idx_list = get_fws_and_tasks(
+        original_wf,
+        fw_name_constraint=fw_name_constraint,
+        task_name_constraint="CopyVaspOutputs",
+    )
+    for idx_fw, idx_t in idx_list:
+        if original_wf.fws[idx_fw].tasks[idx_t]["additional_files"]:
+            original_wf.fws[idx_fw].tasks[idx_t]["additional_files"].extend(vasp_io)
+        else:
+            original_wf.fws[idx_fw].tasks[idx_t].update({"additional_files": vasp_io})
+    return original_wf
