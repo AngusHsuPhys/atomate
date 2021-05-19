@@ -474,7 +474,7 @@ class JScanStaticFW(Firework):
 class JHSEStaticFW(Firework):
     def __init__(self, structure=None, name="HSE_scf", vasp_input_set=None, vasp_input_set_params=None,
                  vasp_cmd=VASP_CMD, prev_calc_loc=True, prev_calc_dir=None, db_file=DB_FILE, vasptodb_kwargs=None,
-                 parents=None, force_gamma=True, **kwargs):
+                 parents=None, force_gamma=True, default_magmom=True, **kwargs):
         t = []
 
         vasp_input_set_params = vasp_input_set_params or {}
@@ -522,9 +522,9 @@ class JHSEStaticFW(Firework):
 
         t.append(RmSelectiveDynPoscar())
 
-        # magmom = MPRelaxSet(structure).incar.get("MAGMOM", None)
-        # if magmom:
-        #     t.append(ModifyIncar(incar_update={"MAGMOM": magmom}))
+        if default_magmom:
+            magmom = MPRelaxSet(structure).incar.get("MAGMOM", None)
+            t.append(ModifyIncar(incar_update={"MAGMOM": magmom}))
 
         if vasp_input_set_params.get("user_incar_settings", {}):
             t.append(ModifyIncar(incar_update=vasp_input_set_params.get("user_incar_settings", {})))
@@ -664,6 +664,7 @@ class JHSERelaxFW(Firework):
             max_force_threshold=False,
             ediffg=None,
             auto_npar=">>auto_npar<<",
+            default_magmom=True,
             half_kpts_first_relax=HALF_KPOINTS_FIRST_RELAX,
             **kwargs
     ):
@@ -696,8 +697,8 @@ class JHSERelaxFW(Firework):
         else:
             raise ValueError("Must specify structure or previous calculation")
 
-        magmom = MPRelaxSet(structure).incar.get("MAGMOM", None)
-        if magmom:
+        if default_magmom:
+            magmom = MPRelaxSet(structure).incar.get("MAGMOM", None)
             t.append(ModifyIncar(incar_update={"MAGMOM": magmom}))
             
         if vasp_input_set_params.get("user_incar_settings", {}):
@@ -729,7 +730,7 @@ class JHSEcDFTFW(Firework):
 
     def __init__(self, up_occupation, down_occupation, nbands, prev_calc_dir=None, filesystem=None,
                  structure=None, specific_structure=None,
-                 name="HSE_cDFT",
+                 name="HSE_cDFT", default_magmom=True,
                  vasp_input_set_params=None, job_type="normal", max_force_threshold=None,
                  vasp_cmd=VASP_CMD, db_file=DB_FILE, vasptodb_kwargs=None,
                  parents=None, prev_calc_loc=True, selective_dynamics=None, force_gamma=True, **kwargs):
@@ -758,9 +759,9 @@ class JHSEcDFTFW(Firework):
         else:
             raise ValueError("Must specify previous calculation or parent")
 
-        # magmom = MPRelaxSet(structure).incar.get("MAGMOM", None)
-        # if magmom:
-        #     t.append(ModifyIncar(incar_update={"MAGMOM": magmom}))
+        if default_magmom:
+            magmom = MPRelaxSet(structure).incar.get("MAGMOM", None)
+            t.append(ModifyIncar(incar_update={"MAGMOM": magmom}))
 
         if vasp_input_set_params.get("user_incar_settings", {}):
             t.append(ModifyIncar(incar_update=vasp_input_set_params.get("user_incar_settings", {})))
