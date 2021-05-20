@@ -488,7 +488,7 @@ class JHSEStaticFW(Firework):
 
         if prev_calc_dir and parents:
             t.append(CopyVaspOutputs(calc_loc=prev_calc_loc, contcar_to_poscar=True))
-            t.append(CopyFiles(from_dir=prev_calc_dir, files_to_copy=["CHGCAR.gz"], continue_on_missing=True))
+            t.append(CopyFiles(from_dir=prev_calc_dir, files_to_copy=["CHGCAR"], continue_on_missing=True))
             t.append(WriteVaspHSEBSFromPrev(mode="uniform", reciprocal_density=None, kpoints_line_density=None))
             t.append(ModifyIncar(incar_update={"ICHARG": 11}))
         elif prev_calc_dir:
