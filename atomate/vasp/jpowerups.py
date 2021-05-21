@@ -172,7 +172,7 @@ def jmodify_to_soc(
 
     return original_wf
 
-def clear_to_db(original_wf, fw_name_constraint=None):
+def remove_todb(original_wf, fw_name_constraint=None):
     """
     Simple powerup that clears the VaspToDb to a workflow.
     Args:
