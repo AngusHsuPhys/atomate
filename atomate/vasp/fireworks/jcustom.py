@@ -579,6 +579,7 @@ class JHSESOCFW(Firework):
         )
 
         vasp_input_set_params = vasp_input_set_params or {}
+        vasp_input_set_params["user_incar_settings"] = {"ISYM": 3}
 
         vasptodb_kwargs = vasptodb_kwargs or {}
         if "additional_fields" not in vasptodb_kwargs:
