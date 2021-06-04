@@ -56,7 +56,7 @@ from atomate.vasp.firetasks.write_inputs import (
 )
 from atomate.vasp.firetasks.neb_tasks import WriteNEBFromImages, WriteNEBFromEndpoints
 
-from atomate.vasp.firetasks.jcustom import RmSelectiveDynPoscar
+# from atomate.vasp.firetasks.jcustom import RmSelectiveDynPoscar
 
 
 class OptimizeFW(Firework):
@@ -429,7 +429,7 @@ class StaticFW(Firework):
         else:
             raise ValueError("Must specify structure or previous calculation")
         # make sure the POSCAR has no selective site properties
-        t.append(RmSelectiveDynPoscar())
+        # t.append(RmSelectiveDynPoscar())
 
         t.append(RunVaspCustodian(vasp_cmd=vasp_cmd, auto_npar=">>auto_npar<<"))
         t.append(PassCalcLocs(name=name))
