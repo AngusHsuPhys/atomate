@@ -106,7 +106,7 @@ class VaspToDb(FiretaskBase):
         task_doc = drone.assimilate(calc_dir)
 
         # Check for additional keys to set based on the fw_spec
-        if self.get("fw_spec_field"):
+        if self.get("fw_spec_field") and isinstance(self.get("fw_spec_field"), list):
             for key in self.get("fw_spec_field"):
                 task_doc.update(fw_spec[key])
 
