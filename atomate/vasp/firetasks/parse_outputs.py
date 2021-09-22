@@ -119,6 +119,7 @@ class VaspToDb(FiretaskBase):
                 f.write(json.dumps(task_doc, default=DATETIME_HANDLER))
         else:
             mmdb = VaspCalcDb.from_db_file(db_file, admin=True)
+            task_doc.update({"db": mmdb.db_name, "collection": mmdb.collection.name})
             t_id = mmdb.insert_task(
                 task_doc, use_gridfs=bool(self.get("parse_dos", False))
                 or bool(self.get("bandstructure_mode", False))
