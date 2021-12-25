@@ -135,6 +135,7 @@ class FileClient(object):
             command = ". ./.bashrc; readlink -f {}".format(path)
             stdin, stdout, stderr = self.ssh.exec_command(command)
             full_path = [l.split('\n')[0] for l in stdout]
+            print(full_path)
             return full_path[0]
 
     def glob(self, path):
