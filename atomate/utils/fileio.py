@@ -119,7 +119,7 @@ class FileClient(object):
                     if os.path.isfile(os.path.join(src, f)):
                         self.sftp.put(os.path.join(src, f), os.path.join(dest, f))
             else:
-                print("src:{}, dest:{}".format(src, dest))
+                print("src: {}, dest: {}".format(src, dest))
                 self.sftp.get(src, dest)
 
     def abspath(self, path):
