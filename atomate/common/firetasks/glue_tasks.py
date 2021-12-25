@@ -316,6 +316,7 @@ class CopyFiles(FiretaskBase):
         "from_dir",
         "to_dir",
         "filesystem",
+        "port",
         "files_to_copy",
         "exclude_files",
         "suffix",
@@ -327,6 +328,7 @@ class CopyFiles(FiretaskBase):
         from_dir,
         to_dir=None,
         filesystem=None,
+        port=27017,
         files_to_copy=None,
         exclude_files=None,
         from_path_dict=None,
@@ -357,7 +359,7 @@ class CopyFiles(FiretaskBase):
         filesystem = filesystem or from_path_dict.get("filesystem", None)
         if from_dir is None:
             raise ValueError("Must specify from_dir!")
-        self.fileclient = FileClient(filesystem=filesystem)
+        self.fileclient = FileClient(filesystem=filesystem, port=port)
         self.from_dir = self.fileclient.abspath(from_dir)
         self.to_dir = env_chk(to_dir, fw_spec, strict=False) or os.getcwd()
         exclude_files = exclude_files or []

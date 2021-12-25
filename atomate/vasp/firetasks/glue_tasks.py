@@ -60,7 +60,7 @@ class CopyVaspOutputs(CopyFiles):
             POSCAR (original POSCAR is not copied).
     """
 
-    optional_params = ["calc_loc", "calc_dir", "filesystem", "additional_files",
+    optional_params = ["calc_loc", "calc_dir", "filesystem", "port", "additional_files",
                        "contcar_to_poscar"]
 
     def run_task(self, fw_spec):
@@ -88,6 +88,7 @@ class CopyVaspOutputs(CopyFiles):
         # setup the copy
         self.setup_copy(self.get("calc_dir", None),
                         filesystem=self.get("filesystem", None),
+                        port=self.get("port", 27017),
                         files_to_copy=files_to_copy, from_path_dict=calc_loc)
         # do the copying
         self.copy_files()
