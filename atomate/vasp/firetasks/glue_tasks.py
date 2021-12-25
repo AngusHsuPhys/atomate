@@ -95,7 +95,7 @@ class CopyVaspOutputs(CopyFiles):
 
     def copy_files(self):
         all_files = self.fileclient.listdir(self.from_dir)
-        print(self.files_to_copy)
+        print(self.from_dir, all_files)
         # start file copy
         for f in self.files_to_copy:
             prev_path_full = os.path.join(self.from_dir, f)
