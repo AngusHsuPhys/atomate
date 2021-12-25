@@ -20,7 +20,7 @@ class FileClient(object):
     of whether those operations are happening locally or via SSH
     """
 
-    def __init__(self, filesystem=None, private_key="~/.ssh/id_rsa"):
+    def __init__(self, filesystem=None, private_key="~/.ssh/id_rsa", port=27017):
         """
         Args:
             filesystem (str): remote filesystem, e.g. username@remote_host.
@@ -36,11 +36,11 @@ class FileClient(object):
             else:
                 username = None  # paramiko sets default username
                 host = filesystem
-            self.ssh = FileClient.get_ssh_connection(username, host, private_key)
+            self.ssh = FileClient.get_ssh_connection(username, host, private_key, port)
             self.sftp = self.ssh.open_sftp()
 
     @staticmethod
-    def get_ssh_connection(username, host, private_key):
+    def get_ssh_connection(username, host, private_key, port):
         """
         Connect to the remote host via paramiko using the private key.
         If the host key is not present it will be added automatically.
@@ -63,7 +63,7 @@ class FileClient(object):
         ssh = paramiko.SSHClient()
         ssh.load_system_host_keys()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(host, username=username, key_filename=private_key, port=12347)
+        ssh.connect(host, username=username, key_filename=private_key, port=port)
         return ssh
 
     @staticmethod
