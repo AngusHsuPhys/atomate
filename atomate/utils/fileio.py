@@ -97,7 +97,7 @@ class FileClient(object):
         if not self.ssh:
             return os.listdir(ldir)
         else:
-            return self.sftp.listdir()
+            return self.sftp.listdir(ldir)
 
     def copy(self, src, dest):
         """
