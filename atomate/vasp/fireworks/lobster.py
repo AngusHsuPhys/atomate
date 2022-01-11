@@ -167,6 +167,7 @@ class LobsterFW(Firework):
         t.append(
             LobsterRunToDb(
                 db_file=db_file,
+                calc_dir=calc_dir,
                 calc_loc=calc_loc,
                 additional_fields=lobstertodb_kwargs,
                 additional_outputs=additional_outputs,
