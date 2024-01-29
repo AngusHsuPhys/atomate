@@ -3,7 +3,7 @@ import re
 import os
 
 # set the default path to the directory of this package atomate
-os.chdir("/workspaces/openmx-wf/Atomate/atomate/atomate/openmx/firetasks/input_yaml/structure")
+os.chdir("/workspaces/atomate/atomate/openmx/firetasks/input_yaml/structure")
 
 # Load the yaml file
 with open('input-set.yaml', 'r') as yaml_file:
