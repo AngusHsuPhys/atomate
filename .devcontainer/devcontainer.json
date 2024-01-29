@@ -6,12 +6,15 @@
 	"image": "mcr.microsoft.com/devcontainers/base:bullseye",
 
 	"features": {
-		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
-			"version": "latest",
-			"enableNonRootDocker": "true",
-			"moby": "true"
-		},
-		"ghcr.io/akhildevelops/devcontainer-features/pip:0": {}
+		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+	},
+
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"GitHub.copilot",
+			]
+		}
 	},
 
 	// Use this environment variable if you need to bind mount your local source code into a new container.
