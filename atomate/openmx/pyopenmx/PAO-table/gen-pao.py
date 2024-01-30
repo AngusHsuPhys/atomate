@@ -56,10 +56,24 @@ def generate_string(vps, option):
     raise ValueError(f"VPS {vps} not found in PAO-table.yaml")
 
 
+def generate_potcar_inputset():
+    # Read the data from the .yaml file
+    with open('PAO-table.yaml', 'r') as file:
+        data = yaml.safe_load(file)
+
+    # Create a new dictionary with the specified format for all items
+    new_data = {}
+    for item in data:
+        new_data[item['VPS'].split('_')[0]] = {
+            'vps': item['VPS'],
+            'option': item['Quick']
+        }
+
+    # Write the new data to a .yaml file
+    with open('potcar.yaml', 'w') as file:
+        yaml.dump(new_data, file)
+
 
 if __name__ == "__main__":
-    print(generate_string("O_PBE19", "Quick"))
-    print(generate_string("O_PBE19", "Standard"))
-    print(generate_string("O_PBE19", "Precise"))
-    print(generate_string("O_PBE19", "Valence electrons"))
-
+    generate_potcar_inputset()
+    
