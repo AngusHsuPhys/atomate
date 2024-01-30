@@ -4,10 +4,11 @@ System:
   level_of_stdout: 1
   level_of_fileout: 1
 
-Definition_of_Atomic_Species:
-  Species_Number: 1
-  Definition: |
-    C   C5.0-s2p2   C_PBE19
+Species:
+    Number: 1
+    Definition: |
+        C   C5.0-s2p2   C_PBE19
+    
 
 Atoms:
   Number: 60
@@ -31,8 +32,8 @@ scf:
   XcType: "GGA-PBE"
   SpinPolarization: "Off"
   ElectronicTemperature: 300.0
-  energycutoff: 150.0
-  maxIter: 70
+  EnergyCutoff: 150.0
+  MaxIter: 70
   EigenvalueSolver: "cluster"
   Kgrid: "1 1 1"
   Mixing:
@@ -48,11 +49,11 @@ scf:
         Weight: 0.400
     History: 20
     StartPulay: 5
-  criterion: 1.0e-10
+  Criterion: 1.0e-10
 
 MD:
   Type: "nomd"
-  maxIter: 1
+  MaxIter: 1
   TimeStep: 1.0
   Opt:
-    criterion: 1.0e-4
+    Criterion: 1.0e-4
