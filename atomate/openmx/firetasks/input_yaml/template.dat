@@ -4,8 +4,8 @@
 
 System.CurrrentDirectory         ./    # default=./
 System.Name                      {{System.Name}}
-level.of.stdout                   {{Level.of.stdout}} # default=1 (0-2)
-level.of.fileout                  {{Level.of.fileout}} # default=1 (0-2)
+level.of.stdout                   {{System.level_of_stdout}} # default=1 (0-2)
+level.of.fileout                  {{System.level_of_fileout}} # default=1 (0-2)
 
 #
 # Definition of Atomic Species
@@ -23,11 +23,11 @@ Definition.of.Atomic.Species>
 Atoms.Number        {{Atoms.Number}}
 Atoms.SpeciesAndCoordinates.Unit   {{Atoms.SpeciesAndCoordinates.Unit}} # Ang|AU
 <Atoms.SpeciesAndCoordinates       
-{{Atoms.SpeciesAndCoordinates}}
+{{Atoms.SpeciesAndCoordinates.Coordinates}}
 Atoms.SpeciesAndCoordinates>
 Atoms.UnitVectors.Unit             {{Atoms.UnitVectors.Unit}} # Ang|AU
 <Atoms.UnitVectors                     # unit=Ang.
-{{Atoms.UnitVectors}}
+{{Atoms.UnitVectors.Vectors}}
 Atoms.UnitVectors>
 
 #
@@ -42,9 +42,9 @@ scf.maxIter                {{Scf.MaxIter}}       # default=40
 scf.EigenvalueSolver       {{Scf.EigenvalueSolver}} # DC|GDC|Cluster|Band
 scf.Kgrid                  {{Scf.Kgrid}}         # means 4x4x4       
 scf.Mixing.Type           {{Scf.Mixing.Type}}   # Simple|Rmm-Diis|Gr-Pulay|Kerker|Rmm-Diisk
-scf.Init.Mixing.Weight     {{Scf.Init.Mixing.Weight}} # default=0.30       
-scf.Min.Mixing.Weight      {{Scf.Min.Mixing.Weight}} # default=0.001        
-scf.Max.Mixing.Weight      {{Scf.Max.Mixing.Weight}} # default=0.40        
+scf.Init.Mixing.Weight     {{Scf.Mixing.Init.Mixing.Weight}} # default=0.30       
+scf.Min.Mixing.Weight      {{Scf.Mixing.Min.Mixing.Weight}} # default=0.001        
+scf.Max.Mixing.Weight      {{Scf.Mixing.Max.Mixing.Weight}} # default=0.40        
 scf.Mixing.History          {{Scf.Mixing.History}} # default=5       
 scf.Mixing.StartPulay       {{Scf.Mixing.StartPulay}} # default=6        
 scf.criterion             {{Scf.Criterion}}     # default=1.0e-6 (Hartree)
