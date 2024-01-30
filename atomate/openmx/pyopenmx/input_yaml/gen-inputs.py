@@ -23,3 +23,9 @@ template = Template(template_str)
 output = template.render(System=data['System'], Species=data['Species'], Atoms=data['Atoms'], Scf=data['scf'], MD=data['MD'])
 
 print(output)
+
+# Write the output to a file
+
+with open('output.dat', 'w') as file:
+  file.write(output)
+  
