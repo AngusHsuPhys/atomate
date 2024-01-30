@@ -3,6 +3,10 @@ import yaml
 import os 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+"""
+https://www.openmx-square.org/openmx_man3.9/node27.html
+"""
+
 
 def parse_raw_data():
     # Read the data from the .dat file
