@@ -1,0 +1,260 @@
+INCAR:
+  XcType: "GGA-PBE"
+  SpinPolarization: "Off"
+  ElectronicTemperature: 300.0
+  EnergyCutoff: 150.0
+  MaxIter: 70
+  EigenvalueSolver: "cluster"
+  Mixing.Type: "rmm-diisk"
+  Mixing.Init.Mixing.Weight: 0.30
+  Mixing.Min.Mixing.Weight: 0.001
+  Mixing.Max.Mixing.Weight: 0.400
+  Mixing.History: 20
+  Mixing.StartPulay: 5
+  Criterion: 1.0e-10
+  MD.Type: "nomd"
+  MD.MaxIter: 1
+  MD.TimeStep: 1.0
+  MD.Opt.Criterion: 1.0e-4
+
+
+KPOINTS:
+  reciprocal_density: 64
+
+
+POTCAR_FUNCTIONAL: PBE
+POTCAR:
+  Ag:
+    option: Ag7.0-s3p2d1
+    vps: Ag_PBE19
+  Al:
+    option: Al7.0-s2p1d1
+    vps: Al_PBE19
+  Ar:
+    option: Ar9.0-s2p2d1
+    vps: Ar_PBE19
+  As:
+    option: As7.0-s3p2d1
+    vps: As_PBE19
+  Au:
+    option: Au7.0-s3p2d2
+    vps: Au_PBE19
+  B:
+    option: B7.0-s2p2
+    vps: B_PBE19
+  Ba:
+    option: Ba10.0-s3p2d1
+    vps: Ba_PBE19
+  Be:
+    option: Be7.0-s2p1
+    vps: Be_PBE19
+  Bi:
+    option: Bi8.0-s3p2d2
+    vps: Bi_PBE19
+  Br:
+    option: Br7.0-s3p2d1
+    vps: Br_PBE19
+  C:
+    option: C6.0-s2p2
+    vps: C_PBE19
+  Ca:
+    option: Ca9.0-s3p2
+    vps: Ca_PBE19
+  Cd:
+    option: Cd7.0-s3p2d1
+    vps: Cd_PBE19
+  Ce:
+    option: Ce8.0-s3p2d1f1
+    vps: Ce_PBE19
+  Cl:
+    option: Cl7.0-s2p2d1
+    vps: Cl_PBE19
+  Co:
+    option: Co6.0S-s2p2d1
+    vps: Co_PBE19S
+  Cr:
+    option: Cr6.0-s2p2d1
+    vps: Cr_PBE19
+  Cs:
+    option: Cs12.0-s3p2d1
+    vps: Cs_PBE19
+  Cu:
+    option: Cu6.0S-s2p1d1
+    vps: Cu_PBE19S
+  Dy:
+    option: Dy8.0-s3p2d1f1
+    vps: Dy_PBE19
+  E:
+    option: Kr10.0-s1p1
+    vps: E
+  F:
+    option: F6.0-s2p2
+    vps: F_PBE19
+  Fe:
+    option: Fe6.0S-s2p2d1
+    vps: Fe_PBE19S
+  Ga:
+    option: Ga7.0-s2p2d1
+    vps: Ga_PBE19
+  Ge:
+    option: Ge7.0-s2p1d1
+    vps: Ge_PBE19
+  H:
+    option: H5.0-s2
+    vps: H_PBE19
+  He:
+    option: He8.0-s1p1
+    vps: He_PBE19
+  Hf:
+    option: Hf9.0-s3p2d2
+    vps: Hf_PBE19
+  Hg:
+    option: Hg8.0-s3p2d2
+    vps: Hg_PBE19
+  Ho:
+    option: Ho8.0-s3p2d1f1
+    vps: Ho_PBE19
+  I:
+    option: I7.0-s3p2d2
+    vps: I_PBE19
+  In:
+    option: In7.0-s3p2d1
+    vps: In_PBE19
+  Ir:
+    option: Ir7.0-s3p2d2
+    vps: Ir_PBE19
+  K:
+    option: K10.0-s3p2
+    vps: K_PBE19
+  Kr:
+    option: Kr10.0-s2p2d1
+    vps: Kr_PBE19
+  La:
+    option: La8.0-s3p2d1f1
+    vps: La_PBE19
+  Li:
+    option: Li8.0-s3p1
+    vps: Li_PBE19
+  Lu:
+    option: Lu8.0-s3p2d2
+    vps: Lu_PBE19
+  Mg:
+    option: Mg9.0-s2p2
+    vps: Mg_PBE19
+  Mn:
+    option: Mn6.0-s2p2d1
+    vps: Mn_PBE19
+  Mo:
+    option: Mo7.0-s3p2d1
+    vps: Mo_PBE19
+  N:
+    option: N6.0-s2p2
+    vps: N_PBE19
+  Na:
+    option: Na9.0-s3p2
+    vps: Na_PBE19
+  Nb:
+    option: Nb7.0-s3p2d1
+    vps: Nb_PBE19
+  Nd:
+    option: Nd8.0-s3p2d1f1
+    vps: Nd_PBE19
+  Ne:
+    option: Ne9.0-s2p2
+    vps: Ne_PBE19
+  Ni:
+    option: Ni6.0S-s2p2d1
+    vps: Ni_PBE19S
+  O:
+    option: O6.0-s2p2
+    vps: O_PBE19
+  Os:
+    option: Os7.0-s3p2d2
+    vps: Os_PBE19
+  P:
+    option: P7.0-s2p2d1
+    vps: P_PBE19
+  Pb:
+    option: Pb8.0-s3p2d2
+    vps: Pb_PBE19
+  Pd:
+    option: Pd7.0-s3p2d1
+    vps: Pd_PBE19
+  Pm:
+    option: Pm8.0-s3p2d1f1
+    vps: Pm_PBE19
+  Pr:
+    option: Pr8.0-s3p2d1f1
+    vps: Pr_PBE19
+  Pt:
+    option: Pt7.0-s3p2d2
+    vps: Pt_PBE19
+  Rb:
+    option: Rb11.0-s2p2d1
+    vps: Rb_PBE19
+  Re:
+    option: Re7.0-s3p2d2
+    vps: Re_PBE19
+  Rh:
+    option: Rh7.0-s3p2d1
+    vps: Rh_PBE19
+  Ru:
+    option: Ru7.0-s3p2d1
+    vps: Ru_PBE19
+  S:
+    option: S7.0-s2p2d1
+    vps: S_PBE19
+  Sb:
+    option: Sb7.0-s3p2d1
+    vps: Sb_PBE19
+  Sc:
+    option: Sc9.0-s2p2d1
+    vps: Sc_PBE19
+  Se:
+    option: Se7.0-s3p2d1
+    vps: Se_PBE19
+  Si:
+    option: Si7.0-s2p1d1
+    vps: Si_PBE19
+  Sm:
+    option: Sm8.0-s3p2d1f1
+    vps: Sm_PBE19
+  Sn:
+    option: Sn7.0-s3p2d1
+    vps: Sn_PBE19
+  Sr:
+    option: Sr10.0-s2p2d1
+    vps: Sr_PBE19
+  Ta:
+    option: Ta7.0-s3p2d2
+    vps: Ta_PBE19
+  Tc:
+    option: Tc7.0-s3p2d1
+    vps: Tc_PBE19
+  Te:
+    option: Te7.0-s3p2d2
+    vps: Te_PBE19
+  Ti:
+    option: Ti7.0-s2p2d1
+    vps: Ti_PBE19
+  Tl:
+    option: Tl8.0-s3p2d2
+    vps: Tl_PBE19
+  V:
+    option: V6.0-s2p2d1
+    vps: V_PBE19
+  W:
+    option: W7.0-s3p2d2
+    vps: W_PBE19
+  Xe:
+    option: Xe11.0-s3p2d1
+    vps: Xe_PBE19
+  Y:
+    option: Y10.0-s3p2d1
+    vps: Y_PBE19
+  Zn:
+    option: Zn6.0S-s2p1d1
+    vps: Zn_PBE19S
+  Zr:
+    option: Zr7.0-s3p2d1
+    vps: Zr_PBE19
