@@ -31,7 +31,7 @@ from atomate.openmx.firetasks.write_inputs import (
     WriteNormalmodeDisplacedPoscar,
     WriteScanRelaxFromPrev,
     WriteTransmutedStructureIOSet,
-    WriteVaspFromIOSet,
+    WriteOpenmxFromIOSet,
     WriteVaspFromIOSetFromInterpolatedPOSCAR,
     WriteVaspHSEBSFromPrev,
     WriteVaspNSCFFromPrev,
@@ -89,9 +89,9 @@ class OpenmxScfFW(Firework):
 
 
         t = []
-        t.append(WriteVaspFromIOSet(
+        t.append(WriteOpenmxFromIOSet(
             structure=structure,
-            openmx_input_set=openmx_input_set, 
+            openmx_input_set=openmx_input_set,
             openmx_dft_data_path=openmx_dft_data_path,
             openmx_input_params=override_default_openmx_params,
             potcar_spec=potcar_spec,
