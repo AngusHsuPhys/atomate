@@ -21,7 +21,7 @@ __email__ = "ajain@lbl.gov"
 
 
 @explicit_serialize
-class WriteVaspFromIOSet(FiretaskBase):
+class WriteOpenmxFromIOSet(FiretaskBase):
     """
     Create VASP input files using implementations of pymatgen's
     AbstractVaspInputSet. An input set can be provided as an object or as a
@@ -64,7 +64,7 @@ class WriteVaspFromIOSet(FiretaskBase):
         atoms.set_initial_magnetic_moments(self.get("magmoms", None) or [0] * len(atoms))
 
         os.environ["OPENMX_DFT_DATA_PATH"] = self["openmx_dft_data_path"]
-        ase_calc = OpenMX(label=f"{self.st.formula}_openmx", **vis.as_dict())
+        ase_calc = OpenMX(label=f"input", **vis.as_dict())
         ase_calc.write_input(atoms)
 
 
