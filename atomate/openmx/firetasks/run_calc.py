@@ -43,7 +43,7 @@ logger = get_logger(__name__)
 
 
 @explicit_serialize
-class RunVaspDirect(FiretaskBase):
+class RunOpenmx(FiretaskBase):
     """
     Execute a command directly (no custodian).
 
@@ -53,13 +53,12 @@ class RunVaspDirect(FiretaskBase):
         expand_vars (str): Set to true to expand variable names in the cmd.
     """
 
-    required_params = ["vasp_cmd"]
-    optional_params = ["expand_vars"]
+    required_params = ["openmx_cmd"]
+    optional_params = ["input_file", "output_file"]
 
     def run_task(self, fw_spec):
-        cmd = env_chk(self["vasp_cmd"], fw_spec)
-        if self.get("expand_vars", False):
-            cmd = os.path.expandvars(cmd)
+        cmd = env_chk(self["openmx_cmd"], fw_spec)
+        cmd += f" {self.get('input_file', 'input.dat')} > {self.get('output_file', 'output.dat')}"
 
         logger.info(f"Running command: {cmd}")
         return_code = subprocess.call(cmd, shell=True)
@@ -94,18 +93,6 @@ class RunVaspCustodian(FiretaskBase):
     """
 
     required_params = ["vasp_cmd"]
-    optional_params = [
-        "job_type",
-        "handler_group",
-        "scratch_dir",
-        "gzip_output",
-        "max_errors",
-        "ediffg",
-        "auto_npar",
-        "gamma_vasp_cmd",
-        "wall_time",
-        "half_kpts_first_relax",
-    ]
 
     def run_task(self, fw_spec):
 
