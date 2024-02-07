@@ -35,10 +35,46 @@ from atomate.vasp.config import DEFUSE_UNSUCCESSFUL, STORE_VOLUMETRIC_DATA
 from atomate.vasp.database import VaspCalcDb
 from atomate.vasp.drones import BADER_EXE_EXISTS, VaspDrone
 
+from ase.calculators.openmx.reader import read_file
+
+
 __author__ = "Anubhav Jain, Kiran Mathew, Shyam Dwaraknath"
 __email__ = "ajain@lbl.gov, kmathew@lbl.gov, shyamd@lbl.gov"
 
 logger = get_logger(__name__)
+
+
+
+@explicit_serialize
+class OpenmxToDb(FiretaskBase):
+    """
+    Insert the a JSON file (default: task.json) directly into the tasks database.
+    Note that if the JSON file contains a "task_id" key, that task_id must not already be present
+    in the tasks collection.
+
+    Optional params:
+        json_filename (str): name of the JSON file to insert (default: "task.json")
+        db_file (str): path to file containing the database credentials. Supports env_chk.
+        calc_dir (str): path to dir (on current filesystem) that contains VASP output files.
+            Default: use current working directory.
+    """
+
+    optional_params = ["db_file", "calc_dir", "additional_fields"]
+
+    def run_task(self, fw_spec):
+        calc_dir = self.get("calc_dir", os.getcwd())
+
+        openmx_out_file = os.path.join(calc_dir, "output.out")
+        task_doc = read_file(openmx_out_file)
+        task_doc.update(self.get("additional_fields", {}))
+
+        db_file = env_chk(self.get("db_file"), fw_spec)
+        if not db_file:
+            with open("task.json", "w") as f:
+                f.write(json.dumps(task_doc, default=DATETIME_HANDLER))
+        else:
+            mmdb = VaspCalcDb.from_db_file(db_file, admin=True)
+            mmdb.insert(task_doc)
 
 
 @explicit_serialize
