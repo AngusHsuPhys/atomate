@@ -11,8 +11,8 @@ STABILITY_CHECK = False
 # openmx specific settings
 OPENMX_DFT_DATA_PATH = ">>openmx_dft_data_path<<"
 OPENMX_CMD = ">>openmx_cmd<<"
-OPENMX_INPUT_FILE = ">>input_file<<"
-OPENMX_OUTPUT_FILE = ">>output_file<<"
+OPENMX_INPUT_FILE = ">>openmx_input_file<<"
+OPENMX_OUTPUT_FILE = ">>openmx_output_file<<"
 # end openmx specific settings
 VDW_KERNEL_DIR = ">>vdw_kernel_dir<<"
 DB_FILE = ">>db_file<<"
