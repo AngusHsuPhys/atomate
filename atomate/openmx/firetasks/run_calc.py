@@ -58,7 +58,7 @@ class RunOpenmx(FiretaskBase):
 
     def run_task(self, fw_spec):
         cmd = env_chk(self["openmx_cmd"], fw_spec)
-        cmd += f" {self.get('input_file', 'input.dat')} > {self.get('output_file', 'output.dat')}"
+        cmd += f" {self.get('input_file', 'input.dat')} > {self.get('output_file', 'output.myout')}"
 
         logger.info(f"Running command: {cmd}")
         return_code = subprocess.call(cmd, shell=True)
