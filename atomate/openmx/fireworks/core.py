@@ -31,11 +31,7 @@ from atomate.vasp.config import (
     VDW_KERNEL_DIR,
 )
 from atomate.openmx.firetasks.glue_tasks import CopyVaspOutputs, pass_vasp_result
-from atomate.openmx.firetasks.neb_tasks import (
-    TransferNEBTask,
-    WriteNEBFromEndpoints,
-    WriteNEBFromImages,
-)
+
 from atomate.openmx.firetasks.parse_outputs import BoltztrapToDb, VaspToDb
 from atomate.openmx.firetasks.run_calc import RunBoltztrap, RunVaspCustodian
 from atomate.openmx.firetasks.write_inputs import (
