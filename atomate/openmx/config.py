@@ -8,7 +8,12 @@ GAMMA_VASP_CMD = ">>gamma_vasp_cmd<<"
 SMALLGAP_KPOINT_MULTIPLY = True
 ADD_MODIFY_INCAR = False
 STABILITY_CHECK = False
-VASP_CMD = ">>vasp_cmd<<"
+# openmx specific settings
+OPENMX_DFT_DATA_PATH = ">>openmx_dft_data_path<<"
+OPENMX_CMD = ">>openmx_cmd<<"
+OPENMX_INPUT_FILE = ">>input_file<<"
+OPENMX_OUTPUT_FILE = ">>output_file<<"
+# end openmx specific settings
 VDW_KERNEL_DIR = ">>vdw_kernel_dir<<"
 DB_FILE = ">>db_file<<"
 ADD_WF_METADATA = True
