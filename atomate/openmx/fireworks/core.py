@@ -23,7 +23,7 @@ from atomate.openmx.config import (
 )
 from atomate.openmx.firetasks.glue_tasks import CopyVaspOutputs, pass_vasp_result
 
-from atomate.openmx.firetasks.parse_outputs import BoltztrapToDb, VaspToDb
+from atomate.openmx.firetasks.parse_outputs import OpenmxToDb
 from atomate.openmx.firetasks.run_calc import RunOpenmx
 from atomate.openmx.firetasks.write_inputs import (
     ModifyIncar,
@@ -51,6 +51,7 @@ class OptimizeFW(Firework):
         structure,
         name="structure optimization",
         openmx_input_set=None,
+        openmx_dft_data_path=">>openmx_dft_data_path<<",
         override_default_openmx_params=None,
         potcar_spec=None,
         magmoms=None,
@@ -60,7 +61,6 @@ class OptimizeFW(Firework):
         output_file=">>output_file<<",
 
         db_file=DB_FILE,
-        openmx_dft_data_path=">>openmx_dft_data_path<<",
         parents=None,
         **kwargs,
     ):
@@ -105,7 +105,7 @@ class OptimizeFW(Firework):
             )
         )
         t.append(PassCalcLocs(name=name))
-        t.append(VaspToDb(db_file=db_file, additional_fields={"task_label": name}))
+        t.append(OpenmxToDb(db_file=db_file, additional_fields={"task_label": name}))
         super().__init__(
             t,
             parents=parents,
