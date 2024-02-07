@@ -8,15 +8,6 @@ import warnings
 from typing import Any
 
 from fireworks import Firework
-from pymatgen.core import Structure
-from pymatgen.io.vasp.sets import (
-    MITMDSet,
-    MITRelaxSet,
-    MPRelaxSet,
-    MPScanRelaxSet,
-    MPSOCSet,
-    MPStaticSet,
-)
 
 from atomate.common.firetasks.glue_tasks import (
     CopyFiles,
@@ -47,18 +38,26 @@ from atomate.openmx.firetasks.write_inputs import (
     WriteVaspStaticFromPrev,
 )
 
+from ase.calculators.openmx import OpenMX
+from ase import Atoms
+
+from pymatgen.io.ase import AseAtomsAdaptor
+from pymatgen.io.vasp.inputs import Structure
+from pymatgen.io.openmx.sets import ScfInputSet
 
 class OptimizeFW(Firework):
     def __init__(
         self,
         structure,
         name="structure optimization",
-        vasp_input_set=None,
+        openmx_input_set=None,
+        potcar_spec=None,
+        magmoms=None,
         vasp_cmd=VASP_CMD,
-        override_default_vasp_params=None,
-        ediffg=None,
+        override_default_openmx_params=None,
         db_file=DB_FILE,
-        force_gamma=True,
+        openmx_dft_data_path=">>openmx_dft_data_path<<",
+        ase_openmx_cmd=">>ase_openmx_cmd<<",
         job_type="double_relaxation_run",
         auto_npar=">>auto_npar<<",
         half_kpts_first_relax=HALF_KPOINTS_FIRST_RELAX,
@@ -85,21 +84,19 @@ class OptimizeFW(Firework):
             parents ([Firework]): Parents of this particular Firework.
             **kwargs: Other kwargs that are passed to Firework.__init__.
         """
-        override_default_vasp_params = override_default_vasp_params or {}
-        vasp_input_set = vasp_input_set or MPRelaxSet(
-            structure, force_gamma=force_gamma, **override_default_vasp_params
-        )
+        override_default_openmx_params = override_default_openmx_params or {}
 
-        if (
-            vasp_input_set.incar["ISIF"] in (0, 1, 2, 7)
-            and job_type == "double_relaxation"
-        ):
-            warnings.warn(
-                f"A double relaxation run might not be appropriate with ISIF {vasp_input_set.incar['ISIF']}"
-            )
 
         t = []
-        t.append(WriteVaspFromIOSet(structure=structure, vasp_input_set=vasp_input_set))
+        t.append(WriteVaspFromIOSet(
+            structure=structure,
+            openmx_input_set=openmx_input_set, 
+            openmx_dft_data_path=openmx_dft_data_path,
+            openmx_input_params=override_default_openmx_params,
+            potcar_spec=potcar_spec,
+            magmoms=magmoms,
+        ))
+
         t.append(
             RunVaspCustodian(
                 vasp_cmd=vasp_cmd,
