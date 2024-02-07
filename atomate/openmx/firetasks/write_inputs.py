@@ -9,19 +9,9 @@ import numpy as np
 from fireworks import FiretaskBase, explicit_serialize
 from fireworks.utilities.dict_mods import apply_mod
 from monty.serialization import dumpfn
-from pymatgen.alchemy.materials import TransformedStructure
-from pymatgen.alchemy.transmuters import StandardTransmuter
-from pymatgen.core.structure import Structure
-from pymatgen.io.vasp import Incar, Kpoints, Poscar, Potcar, PotcarSingle
-from pymatgen.io.vasp.outputs import Vasprun
-from pymatgen.io.vasp.sets import (
-    MPHSEBSSet,
-    MPNMRSet,
-    MPNonSCFSet,
-    MPScanRelaxSet,
-    MPSOCSet,
-    MPStaticSet,
-)
+
+from ase.calculators.openmx import OpenMX
+from pymatgen.io.ase import AseAtomsAdaptor
 
 from atomate.utils.utils import env_chk, load_class
 from atomate.vasp.firetasks.glue_tasks import GetInterpolatedPOSCAR
@@ -57,29 +47,30 @@ class WriteVaspFromIOSet(FiretaskBase):
             to obtain the structure
     """
 
-    required_params = ["structure", "vasp_input_set"]
-    optional_params = ["vasp_input_params", "potcar_spec", "spec_structure_key"]
+    required_params = ["structure", "openmx_input_set", "openmx_dft_data_path"]
+    optional_params = ["openmx_input_params", "potcar_spec", "magmoms"]
 
     def run_task(self, fw_spec):
-        # if a full VaspInputSet object was provided
-        if hasattr(self["vasp_input_set"], "write_input"):
-            vis = self["vasp_input_set"]
+        vis_cls = load_class("pymatgen.io.openmx.sets", self["openmx_input_set"])
 
-        # if VaspInputSet String + parameters was provided
-        else:
-            vis_cls = load_class("pymatgen.io.vasp.sets", self["vasp_input_set"])
-            vis = vis_cls(self["structure"], **self.get("vasp_input_params", {}))
 
-        # over-write structure with fw_spec structure
-        spec_structure_key = self.get("spec_structure_key", None)
-        if spec_structure_key is not None:
-            fw_struct = fw_spec.get(spec_structure_key)
-            dd = vis.as_dict()
-            dd["structure"] = fw_struct
-            vis = vis.from_dict(dd)
+        input_params = self.get("openmx_input_params", {})
+        if self.get("potcar_spec", False):
+            input_params.update({"definition_of_atomic_species": self.get("potcar_spec")})
 
-        potcar_spec = self.get("potcar_spec", False)
-        vis.write_input(".", potcar_spec=potcar_spec)
+        vis = vis_cls(self["structure"], **input_params)
+
+        atoms = AseAtomsAdaptor.get_atoms(self["structure"])
+        atoms.set_initial_magnetic_moments(self.get("magmoms", None) or [0] * len(atoms))
+
+        os.environ["OPENMX_DFT_DATA_PATH"] = self["openmx_dft_data_path"]
+        ase_calc = OpenMX(label=f"{self.st.formula}_openmx", **vis.as_dict())
+        ase_calc.write_input(atoms)
+
+
+
+
+        
 
 
 @explicit_serialize
