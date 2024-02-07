@@ -15,7 +15,7 @@ from atomate.common.firetasks.glue_tasks import (
     GzipDir,
     PassCalcLocs,
 )
-from atomate.vasp.config import (
+from atomate.openmx.config import (
     DB_FILE,
     HALF_KPOINTS_FIRST_RELAX,
     VASP_CMD,
@@ -24,7 +24,7 @@ from atomate.vasp.config import (
 from atomate.openmx.firetasks.glue_tasks import CopyVaspOutputs, pass_vasp_result
 
 from atomate.openmx.firetasks.parse_outputs import BoltztrapToDb, VaspToDb
-from atomate.openmx.firetasks.run_calc import RunBoltztrap, RunVaspCustodian
+from atomate.openmx.firetasks.run_calc import RunOpenmx
 from atomate.openmx.firetasks.write_inputs import (
     ModifyIncar,
     WriteNormalmodeDisplacedPoscar,
@@ -51,16 +51,16 @@ class OptimizeFW(Firework):
         structure,
         name="structure optimization",
         openmx_input_set=None,
+        override_default_openmx_params=None,
         potcar_spec=None,
         magmoms=None,
-        vasp_cmd=VASP_CMD,
-        override_default_openmx_params=None,
+        
+        openmx_cmd=">>openmx_cmd<<",
+        input_file=">>input_file<<",
+        output_file=">>output_file<<",
+
         db_file=DB_FILE,
         openmx_dft_data_path=">>openmx_dft_data_path<<",
-        ase_openmx_cmd=">>ase_openmx_cmd<<",
-        job_type="double_relaxation_run",
-        auto_npar=">>auto_npar<<",
-        half_kpts_first_relax=HALF_KPOINTS_FIRST_RELAX,
         parents=None,
         **kwargs,
     ):
@@ -98,12 +98,10 @@ class OptimizeFW(Firework):
         ))
 
         t.append(
-            RunVaspCustodian(
-                vasp_cmd=vasp_cmd,
-                job_type=job_type,
-                ediffg=ediffg,
-                auto_npar=auto_npar,
-                half_kpts_first_relax=half_kpts_first_relax,
+            RunOpenmx(
+                openmx_cmd=openmx_cmd,
+                input_file=input_file,
+                output_file=output_file,            
             )
         )
         t.append(PassCalcLocs(name=name))
