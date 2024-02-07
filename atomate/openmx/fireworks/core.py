@@ -46,7 +46,7 @@ from pymatgen.io.ase import AseAtomsAdaptor
 from pymatgen.io.vasp.inputs import Structure
 from pymatgen.io.openmx.sets import ScfInputSet
 
-class OptimizeFW(Firework):
+class OpenmxScfFW(Firework):
     def __init__(
         self,
         structure,
