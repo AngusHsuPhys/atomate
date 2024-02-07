@@ -51,7 +51,7 @@ class OpenmxScfFW(Firework):
         self,
         structure,
         name="structure optimization",
-        openmx_input_set=None,
+        openmx_input_set="ScfInputSet",
         openmx_dft_data_path=OPENMX_DFT_DATA_PATH,
         override_default_openmx_params=None,
         potcar_spec=None,
