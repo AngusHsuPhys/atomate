@@ -51,8 +51,7 @@ class WriteOpenmxFromIOSet(FiretaskBase):
     optional_params = ["openmx_input_params", "potcar_spec", "magmoms"]
 
     def run_task(self, fw_spec):
-        vis_cls = load_class("pymatgen.io.openmx.sets", self["openmx_input_set"])
-
+        vis_cls = load_class("pymatgen.io.openmx.sets", self.get("openmx_input_set"))
 
         input_params = self.get("openmx_input_params", {})
         if self.get("potcar_spec", False):
