@@ -17,9 +17,10 @@ from atomate.common.firetasks.glue_tasks import (
 )
 from atomate.openmx.config import (
     DB_FILE,
-    HALF_KPOINTS_FIRST_RELAX,
-    VASP_CMD,
-    VDW_KERNEL_DIR,
+    OPENMX_DFT_DATA_PATH,
+    OPENMX_CMD,
+    OPENMX_INPUT_FILE,
+    OPENMX_OUTPUT_FILE
 )
 from atomate.openmx.firetasks.glue_tasks import CopyVaspOutputs, pass_vasp_result
 
@@ -51,14 +52,14 @@ class OptimizeFW(Firework):
         structure,
         name="structure optimization",
         openmx_input_set=None,
-        openmx_dft_data_path=">>openmx_dft_data_path<<",
+        openmx_dft_data_path=OPENMX_DFT_DATA_PATH,
         override_default_openmx_params=None,
         potcar_spec=None,
         magmoms=None,
         
-        openmx_cmd=">>openmx_cmd<<",
-        input_file=">>input_file<<",
-        output_file=">>output_file<<",
+        openmx_cmd=OPENMX_CMD,
+        input_file=OPENMX_INPUT_FILE,
+        output_file=OPENMX_OUTPUT_FILE,
 
         db_file=DB_FILE,
         parents=None,
