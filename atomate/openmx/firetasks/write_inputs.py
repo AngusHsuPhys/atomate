@@ -63,13 +63,14 @@ class WriteOpenmxFromIOSet(FiretaskBase):
         atoms.set_initial_magnetic_moments(self.get("magmoms", None) or [0] * len(atoms))
 
         os.environ["OPENMX_DFT_DATA_PATH"] = self["openmx_dft_data_path"]
+
+        print(f"vis.as_dict(): {vis.as_dict()}")
+        print(f"env_vars: {os.environ}")
+
         ase_calc = OpenMX(label=f"input", **vis.as_dict())
         ase_calc.write_input(atoms)
 
 
-
-
-        
 
 
 @explicit_serialize
