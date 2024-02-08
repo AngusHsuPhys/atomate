@@ -45,42 +45,46 @@ logger = get_logger(__name__)
 
 
 
+# @explicit_serialize
+# class OpenmxToDb(FiretaskBase):
+#     """
+#     Insert the a JSON file (default: task.json) directly into the tasks database.
+#     Note that if the JSON file contains a "task_id" key, that task_id must not already be present
+#     in the tasks collection.
+
+#     Optional params:
+#         json_filename (str): name of the JSON file to insert (default: "task.json")
+#         db_file (str): path to file containing the database credentials. Supports env_chk.
+#         calc_dir (str): path to dir (on current filesystem) that contains VASP output files.
+#             Default: use current working directory.
+#     """
+
+#     optional_params = ["db_file", "calc_dir", "additional_fields"]
+
+#     def run_task(self, fw_spec):
+#         calc_dir = self.get("calc_dir", os.getcwd())
+
+#         openmx_out_file = os.path.join(calc_dir, "output.out")
+#         task_doc = read_file(openmx_out_file)
+#         task_doc.update(self.get("additional_fields", {}))
+#         task_doc.update({"dir_name": calc_dir})
+
+#         db_file = env_chk(self.get("db_file"), fw_spec)
+#         if not db_file:
+#             with open("task.json", "w") as f:
+#                 f.write(json.dumps(task_doc, default=DATETIME_HANDLER))
+#         else:
+#             print(f"task_doc: {task_doc}")
+#             mmdb = VaspCalcDb.from_db_file(db_file, admin=True)
+#             mmdb.insert(task_doc)
+
+#         # Check for additional keys to set based on the fw_spec
+#         if self.get("fw_spec_field"):
+#             task_doc.update(fw_spec[self.get("fw_spec_field")])
+
+
 @explicit_serialize
 class OpenmxToDb(FiretaskBase):
-    """
-    Insert the a JSON file (default: task.json) directly into the tasks database.
-    Note that if the JSON file contains a "task_id" key, that task_id must not already be present
-    in the tasks collection.
-
-    Optional params:
-        json_filename (str): name of the JSON file to insert (default: "task.json")
-        db_file (str): path to file containing the database credentials. Supports env_chk.
-        calc_dir (str): path to dir (on current filesystem) that contains VASP output files.
-            Default: use current working directory.
-    """
-
-    optional_params = ["db_file", "calc_dir", "additional_fields"]
-
-    def run_task(self, fw_spec):
-        calc_dir = self.get("calc_dir", os.getcwd())
-
-        openmx_out_file = os.path.join(calc_dir, "output.out")
-        task_doc = read_file(openmx_out_file)
-        task_doc.update(self.get("additional_fields", {}))
-        task_doc.update({"dir_name": calc_dir})
-
-        db_file = env_chk(self.get("db_file"), fw_spec)
-        if not db_file:
-            with open("task.json", "w") as f:
-                f.write(json.dumps(task_doc, default=DATETIME_HANDLER))
-        else:
-            print(f"task_doc: {task_doc}")
-            mmdb = VaspCalcDb.from_db_file(db_file, admin=True)
-            mmdb.insert(task_doc)
-
-
-@explicit_serialize
-class VaspToDb(FiretaskBase):
     """
     Enter a VASP run into the database. Uses current directory unless you
     specify calc_dir or calc_loc.
@@ -145,21 +149,11 @@ class VaspToDb(FiretaskBase):
         # parse the VASP directory
         logger.info(f"PARSING DIRECTORY: {calc_dir}")
 
-        drone = VaspDrone(
-            additional_fields=self.get("additional_fields"),
-            parse_dos=self.get("parse_dos", False),
-            parse_potcar_file=self.get("parse_potcar_file", True),
-            bandstructure_mode=self.get("bandstructure_mode", False),
-            parse_bader=self.get("parse_bader", BADER_EXE_EXISTS),
-            parse_chgcar=self.get("parse_chgcar", False),  # deprecated
-            parse_aeccar=self.get("parse_aeccar", False),  # deprecated
-            store_volumetric_data=self.get(
-                "store_volumetric_data", STORE_VOLUMETRIC_DATA
-            ),
-        )
-
-        # assimilate (i.e., parse)
-        task_doc = drone.assimilate(calc_dir)
+        # parse the output
+        openmx_out_file = os.path.join(calc_dir, "output.out")
+        task_doc = read_file(openmx_out_file)
+        task_doc.update(self.get("additional_fields", {}))
+        task_doc.update({"dir_name": calc_dir})
 
         # Check for additional keys to set based on the fw_spec
         if self.get("fw_spec_field"):
@@ -174,14 +168,7 @@ class VaspToDb(FiretaskBase):
                 f.write(json.dumps(task_doc, default=DATETIME_HANDLER))
         else:
             mmdb = VaspCalcDb.from_db_file(db_file, admin=True)
-            t_id = mmdb.insert_task(
-                task_doc,
-                use_gridfs=self.get("parse_dos", False)
-                or bool(self.get("bandstructure_mode", False))
-                or self.get("parse_chgcar", False)  # deprecated
-                or self.get("parse_aeccar", False)  # deprecated
-                or bool(self.get("store_volumetric_data", STORE_VOLUMETRIC_DATA)),
-            )
+            t_id = mmdb.insert(task_doc)
             logger.info(f"Finished parsing with task_id: {t_id}")
 
         defuse_children = False
