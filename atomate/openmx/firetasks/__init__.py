@@ -6,6 +6,7 @@ from .glue_tasks import (
 )
 from .parse_outputs import (
     OpenmxToDb,
+    OpenmxJsonToDb,
     BoltztrapToDb,
     ElasticTensorToDb,
     FitEOSToDb,
