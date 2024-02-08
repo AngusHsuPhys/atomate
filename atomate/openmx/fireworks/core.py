@@ -50,7 +50,7 @@ class OpenmxScfFW(Firework):
     def __init__(
         self,
         structure,
-        name="openmx_scf",
+        name="scf",
         openmx_input_set="ScfInputSet",
         openmx_dft_data_path=OPENMX_DFT_DATA_PATH,
         override_default_openmx_params=None,
