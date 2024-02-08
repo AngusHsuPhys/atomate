@@ -244,7 +244,7 @@ class OpenmxJsonToDb(FiretaskBase):
         logger.info(f"PARSING DIRECTORY: {calc_dir}")
 
         # parse the output
-        openmx_out_file = os.path.join(calc_dir, "output.out")
+        openmx_out_file = os.path.join(calc_dir, "openmx.out")
         task_doc = read_file(openmx_out_file)
         task_doc.update(self.get("additional_fields", {}))
         task_doc.update({"dir_name": calc_dir})

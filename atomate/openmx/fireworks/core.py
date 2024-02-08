@@ -50,7 +50,7 @@ class OpenmxScfFW(Firework):
     def __init__(
         self,
         structure,
-        name="structure optimization",
+        name="openmx_scf",
         openmx_input_set="ScfInputSet",
         openmx_dft_data_path=OPENMX_DFT_DATA_PATH,
         override_default_openmx_params=None,
@@ -58,8 +58,8 @@ class OpenmxScfFW(Firework):
         magmoms=None,
         
         openmx_cmd=OPENMX_CMD,
-        input_file=OPENMX_INPUT_FILE,
-        output_file=OPENMX_OUTPUT_FILE,
+        # input_file=OPENMX_INPUT_FILE,
+        # output_file=OPENMX_OUTPUT_FILE,
 
         db_file=DB_FILE,
         parents=None,
@@ -101,8 +101,8 @@ class OpenmxScfFW(Firework):
         t.append(
             RunOpenmx(
                 openmx_cmd=openmx_cmd,
-                input_file=input_file,
-                output_file=output_file,            
+                # input_file=input_file,
+                # output_file=output_file,            
             )
         )
         t.append(PassCalcLocs(name=name))

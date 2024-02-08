@@ -68,7 +68,7 @@ class WriteOpenmxFromIOSet(FiretaskBase):
         # print env OPENMX_DFT_DATA_PATH
         print(f"OPENMX_DFT_DATA_PATH: {os.environ['OPENMX_DFT_DATA_PATH']}")
 
-        ase_calc = OpenMX(label=f"input", **vis.as_dict())
+        ase_calc = OpenMX(label="openmx", **vis.as_dict())
         ase_calc.write_input(atoms)
 
 
