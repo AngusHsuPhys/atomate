@@ -74,6 +74,7 @@ class OpenmxToDb(FiretaskBase):
             with open("task.json", "w") as f:
                 f.write(json.dumps(task_doc, default=DATETIME_HANDLER))
         else:
+            print(f"task_doc: {task_doc}")
             mmdb = VaspCalcDb.from_db_file(db_file, admin=True)
             mmdb.insert(task_doc)
 
