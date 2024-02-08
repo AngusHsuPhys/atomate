@@ -51,7 +51,7 @@ class WriteOpenmxFromIOSet(FiretaskBase):
     optional_params = ["openmx_input_params", "potcar_spec", "magmoms"]
 
     def run_task(self, fw_spec):
-        vis_cls = load_class("pymatgen.io.openmx.sets", env_chk(self.get("openmx_input_set")))
+        vis_cls = load_class("pymatgen.io.openmx.sets", env_chk(self.get("openmx_input_set"), fw_spec))
 
         input_params = self.get("openmx_input_params", {})
         if self.get("potcar_spec", False):
@@ -62,7 +62,7 @@ class WriteOpenmxFromIOSet(FiretaskBase):
         atoms = AseAtomsAdaptor.get_atoms(self["structure"])
         atoms.set_initial_magnetic_moments(self.get("magmoms", None) or [0] * len(atoms))
 
-        os.environ["OPENMX_DFT_DATA_PATH"] = env_chk(self["openmx_dft_data_path"])
+        os.environ["OPENMX_DFT_DATA_PATH"] = env_chk(self["openmx_dft_data_path"], fw_spec)
 
         print(f"vis.as_dict(): {vis.as_dict()}")
         # print env OPENMX_DFT_DATA_PATH
