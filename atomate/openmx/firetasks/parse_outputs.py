@@ -67,6 +67,7 @@ class OpenmxToDb(FiretaskBase):
         openmx_out_file = os.path.join(calc_dir, "output.out")
         task_doc = read_file(openmx_out_file)
         task_doc.update(self.get("additional_fields", {}))
+        task_doc.update({"dir_name": calc_dir})
 
         db_file = env_chk(self.get("db_file"), fw_spec)
         if not db_file:
