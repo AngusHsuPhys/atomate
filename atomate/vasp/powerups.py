@@ -20,7 +20,6 @@ from atomate.vasp.config import (
 )
 from atomate.vasp.firetasks.glue_tasks import CheckBandgap, CheckStability
 from atomate.vasp.firetasks.lobster_tasks import RunLobsterFake
-from atomate.vasp.firetasks.neb_tasks import RunNEBVaspFake
 from atomate.vasp.firetasks.parse_outputs import JsonToDb
 from atomate.vasp.firetasks.run_calc import (
     RunNoVasp,
@@ -185,12 +184,6 @@ def use_fake_vasp(
                             check_poscar=check_poscar,
                             check_potcar=check_potcar,
                             clear_inputs=clear_inputs,
-                        )
-
-                    if "RunVaspCustodian" in t_str and t_job_type == "neb":
-                        original_wf.fws[idx_fw].tasks[idx_t] = RunNEBVaspFake(
-                            ref_dir=ref_dirs[job_type],
-                            params_to_check=params_to_check,
                         )
 
     return original_wf
