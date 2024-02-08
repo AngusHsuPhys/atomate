@@ -178,6 +178,97 @@ class OpenmxToDb(FiretaskBase):
     
 
 @explicit_serialize
+class OpenmxJsonToDb(FiretaskBase):
+    """
+    Enter a VASP run into the database. Uses current directory unless you
+    specify calc_dir or calc_loc.
+
+    Optional params:
+        calc_dir (str): path to dir (on current filesystem) that contains VASP
+            output files. Default: use current working directory.
+        calc_loc (str OR bool): if True will set most recent calc_loc. If str
+            search for the most recent calc_loc with the matching name
+        parse_dos (bool): whether to parse the DOS and store in GridFS.
+            Defaults to False.
+        parse_potcar_file (bool): Whether to parse the potcar file. Defaults to
+            True.
+        parse_bader (bool): Whether to perform Bader charge analysis when parsing
+            the charge density. Default: True if bader.exe exists in the path.
+        bandstructure_mode (str): Set to "uniform" for uniform band structure.
+            Set to "line" for line mode. If not set, band structure will not
+            be parsed.
+        additional_fields (dict): dict of additional fields to add
+        db_file (str): path to file containing the database credentials.
+            Supports env_chk. Default: write data to JSON file.
+        fw_spec_field (str): if set, will update the task doc with the contents
+            of this key in the fw_spec.
+        defuse_unsuccessful (bool): this is a three-way toggle on what to do if
+            your job looks OK, but is actually not converged (either electronic or
+            ionic). True -> mark job as COMPLETED, but defuse children.
+            False --> do nothing, continue with workflow as normal. "fizzle"
+            --> throw an error (mark this job as FIZZLED)
+        task_fields_to_push (dict): if set, will update the next Firework/Firetask
+            spec using fields from the task document.
+            Format: {key : path} -> fw.spec[key] = task_doc[path]
+            The path is a full mongo-style path so subdocuments can be referenced
+            using dot notation and array keys can be referenced using the index.
+            E.g "calcs_reversed.0.output.outcar.run_stats"
+    """
+
+    optional_params = [
+        "calc_dir",
+        "calc_loc",
+        "parse_dos",
+        "bandstructure_mode",
+        "additional_fields",
+        "db_file",
+        "fw_spec_field",
+        "defuse_unsuccessful",
+        "task_fields_to_push",
+        "parse_chgcar",
+        "parse_aeccar",
+        "parse_potcar_file",
+        "parse_bader",
+        "store_volumetric_data",
+    ]
+
+    def run_task(self, fw_spec):
+        # get the directory that contains the VASP dir to parse
+        calc_dir = os.getcwd()
+        if "calc_dir" in self:
+            calc_dir = self["calc_dir"]
+        elif self.get("calc_loc"):
+            calc_dir = get_calc_loc(self["calc_loc"], fw_spec["calc_locs"])["path"]
+
+        # parse the VASP directory
+        logger.info(f"PARSING DIRECTORY: {calc_dir}")
+
+        # parse the output
+        openmx_out_file = os.path.join(calc_dir, "output.out")
+        task_doc = read_file(openmx_out_file)
+        task_doc.update(self.get("additional_fields", {}))
+        task_doc.update({"dir_name": calc_dir})
+
+        # Check for additional keys to set based on the fw_spec
+        if self.get("fw_spec_field"):
+            task_doc.update(fw_spec[self.get("fw_spec_field")])
+
+        # get the database connection
+        db_file = env_chk(self.get("db_file"), fw_spec)
+
+        # db insertion or taskdoc dump
+        if not db_file or os.path.exists(zpath("FW_offline.json")):
+            with open("task.json", "w") as f:
+                f.write(json.dumps(task_doc, default=DATETIME_HANDLER))
+        else:
+            mmdb = VaspCalcDb.from_db_file(db_file, admin=True)
+            t_id = mmdb.insert(task_doc)
+            logger.info(f"Finished parsing with task_id: {t_id}")
+
+
+
+
+@explicit_serialize
 class VaspToDb(FiretaskBase):
     """
     Enter a VASP run into the database. Uses current directory unless you
