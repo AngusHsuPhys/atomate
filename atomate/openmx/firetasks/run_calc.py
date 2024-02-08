@@ -54,7 +54,7 @@ class RunOpenmx(FiretaskBase):
     """
 
     required_params = ["openmx_cmd"]
-    # optional_params = ["input_file", "output_file"]
+    # optional_params = ["openmx_input_file", "openmx_output_file"]
 
     def run_task(self, fw_spec):
         cmd = env_chk(self["openmx_cmd"], fw_spec)
