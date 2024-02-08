@@ -17,6 +17,7 @@ from .parse_outputs import (
     PolarizationToDb,
     RamanTensorToDb,
     ThermalExpansionCoeffToDb,
+    VaspToDb,
 )
 from .run_calc import (
     RunOpenmx,
