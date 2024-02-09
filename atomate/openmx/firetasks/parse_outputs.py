@@ -36,6 +36,7 @@ from atomate.vasp.database import VaspCalcDb
 from atomate.vasp.drones import BADER_EXE_EXISTS, VaspDrone
 
 from atomate.openmx.drones import openmxDrone
+from atomate.openmx.database import openmxCalcDb
 from ase.calculators.openmx.reader import read_file
 
 
@@ -133,7 +134,7 @@ class OpenmxToDb(FiretaskBase):
             with open("task.json", "w") as f:
                 f.write(json.dumps(task_doc, default=DATETIME_HANDLER))
         else:
-            mmdb = VaspCalcDb.from_db_file(db_file, admin=True)
+            mmdb = openmxCalcDb.from_db_file(db_file, admin=True)
             t_id = mmdb.insert_task(task_doc)
             logger.info(f"Finished parsing with task_id: {t_id}")
 

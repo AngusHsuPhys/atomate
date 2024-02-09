@@ -34,7 +34,7 @@ OBJ_NAMES = (
 )
 
 
-class VaspCalcDb(CalcDb):
+class openmxCalcDb(CalcDb):
     """
     Class to help manage database insertions of Vasp drones
     """
