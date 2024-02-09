@@ -135,7 +135,11 @@ class OpenmxToDb(FiretaskBase):
                 f.write(json.dumps(task_doc, default=DATETIME_HANDLER))
         else:
             mmdb = openmxCalcDb.from_db_file(db_file, admin=True)
-            t_id = mmdb.insert_task(task_doc)
+            t_id = mmdb.insert_task(task_doc, 
+                use_gridfs=self.get("parse_out", True)
+                or bool(self.get("parse_scfout", True))
+                or bool(self.get("store_volumetric_data", STORE_VOLUMETRIC_DATA)),
+            )
             logger.info(f"Finished parsing with task_id: {t_id}")
 
         defuse_children = False
