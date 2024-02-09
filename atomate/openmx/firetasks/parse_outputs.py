@@ -35,6 +35,7 @@ from atomate.vasp.config import DEFUSE_UNSUCCESSFUL, STORE_VOLUMETRIC_DATA
 from atomate.vasp.database import VaspCalcDb
 from atomate.vasp.drones import BADER_EXE_EXISTS, VaspDrone
 
+from atomate.openmx.drones import openmxDrone
 from ase.calculators.openmx.reader import read_file
 
 
@@ -93,10 +94,8 @@ class OpenmxToDb(FiretaskBase):
         "fw_spec_field",
         "defuse_unsuccessful",
         "task_fields_to_push",
-        "parse_chgcar",
-        "parse_aeccar",
-        "parse_potcar_file",
-        "parse_bader",
+        "parse_out",
+        "parse_scfout",
         "store_volumetric_data",
     ]
 
@@ -111,11 +110,16 @@ class OpenmxToDb(FiretaskBase):
         # parse the VASP directory
         logger.info(f"PARSING DIRECTORY: {calc_dir}")
 
-        # parse the output
-        openmx_out_file = os.path.join(calc_dir, "output.out")
-        task_doc = read_file(openmx_out_file)
-        task_doc.update(self.get("additional_fields", {}))
-        task_doc.update({"dir_name": calc_dir})
+        drone = openmxDrone(
+            additional_fields=self.get("additional_fields"),
+            parse_out = self.get("parse_out", True),
+            parse_scfout = self.get("parse_scfout", True),
+            store_volumetric_data=self.get(
+                "store_volumetric_data", STORE_VOLUMETRIC_DATA
+            ),
+        )
+        # assimilate (i.e., parse)
+        task_doc = drone.assimilate(calc_dir)
 
         # Check for additional keys to set based on the fw_spec
         if self.get("fw_spec_field"):
@@ -130,7 +134,7 @@ class OpenmxToDb(FiretaskBase):
                 f.write(json.dumps(task_doc, default=DATETIME_HANDLER))
         else:
             mmdb = VaspCalcDb.from_db_file(db_file, admin=True)
-            t_id = mmdb.insert(task_doc)
+            t_id = mmdb.insert_task(task_doc)
             logger.info(f"Finished parsing with task_id: {t_id}")
 
         defuse_children = False
