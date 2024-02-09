@@ -257,7 +257,7 @@ class openmxDrone(AbstractDrone):
 
     def process_out(self, dir_name, filename, taskname):
         f = os.path.join(dir_name, filename)
-        with open(f) as fp:
+        with open(f, 'r', encoding='ISO-8859-1') as fp:
             data = fp.read()
         
         d = {}
