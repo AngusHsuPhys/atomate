@@ -106,7 +106,7 @@ class OpenmxScfFW(Firework):
             )
         )
         t.append(PassCalcLocs(name=name))
-        t.append(OpenmxJsonToDb(db_file=db_file, additional_fields={"task_label": name}))
+        t.append(OpenmxToDb(db_file=db_file, additional_fields={"task_label": name}))
         super().__init__(
             t,
             parents=parents,
