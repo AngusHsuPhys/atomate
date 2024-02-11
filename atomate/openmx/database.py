@@ -126,7 +126,7 @@ class openmxCalcDb(CalcDb):
             # remove the big object from all calcs_reversed
             # this can catch situations were the drone added the data to more than one calc.
             for i_calcs in range(len(task_doc["calcs_reversed"])):
-                if obj_key in task_doc["calcs_reversed"][i_calcs]:
+                if obj_key in task_doc["calcs_reversed"][i_calcs].keys():
                     del task_doc["calcs_reversed"][i_calcs][obj_key]
             return calcs_r_data
 
