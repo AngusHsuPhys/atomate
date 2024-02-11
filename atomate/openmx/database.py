@@ -182,6 +182,8 @@ class openmxCalcDb(CalcDb):
             aeccar = self.get_aeccar(task_id)
             calc["aeccar0"] = aeccar["aeccar0"]
             calc["aeccar2"] = aeccar["aeccar2"]
+        if "out" in calc:
+            calc["out"] = json.loads(calc["out"])
         return task_doc
 
     def insert_object(self, use_gridfs, *args, **kwargs):
@@ -308,6 +310,30 @@ class openmxCalcDb(CalcDb):
             bs_json = zlib.decompress(fs.get(fs_id).read())
             obj_dict = json.loads(bs_json.decode())
         return obj_dict
+    
+    def get_openmx_output(self, task_id):
+        """
+        Read the OUT data into a dictionary
+
+        Args:
+            task_id(int or str): the task_id containing the data
+        Returns:
+            dict: the OUT data
+        """
+        obj_dict = self.get_data_from_maggma_or_gridfs(task_id, key="out")
+        return obj_dict
+    
+    def get_openmx_scfout(self, task_id):
+        """
+        Read the SCFOUT data into a dictionary
+
+        Args:
+            task_id(int or str): the task_id containing the data
+        Returns:
+            dict: the SCFOUT data
+        """
+        obj_dict = self.get_data_from_maggma_or_gridfs(task_id, key="scfout")
+        return obj_dict
 
     def get_band_structure(self, task_id):
         """
@@ -372,6 +398,7 @@ class openmxCalcDb(CalcDb):
             ValueError(f"The AECCAR seems to be corrupted for task_id = {task_id}")
 
         return {"aeccar0": aeccar0, "aeccar2": aeccar2}
+
 
     def reset(self):
         self.collection.delete_many({})
