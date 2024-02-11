@@ -183,7 +183,11 @@ class openmxCalcDb(CalcDb):
             calc["aeccar0"] = aeccar["aeccar0"]
             calc["aeccar2"] = aeccar["aeccar2"]
         if "out" in calc:
-            calc["out"] = json.loads(calc["out"])
+            out = self.get_openmx_output(task_id)
+            calc["out"] = out
+        if "scfout" in calc:
+            scfout = self.get_openmx_scfout(task_id)
+            calc["scfout"] = scfout
         return task_doc
 
     def insert_object(self, use_gridfs, *args, **kwargs):
