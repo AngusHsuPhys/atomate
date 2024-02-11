@@ -121,14 +121,21 @@ class openmxCalcDb(CalcDb):
             Args:
                 obj_key: Key of the data in calcs_reversed.0 to store
             """
-            calcs_r_data = task_doc[obj_key]
-            del task_doc[obj_key]
+            calcs_r_data = task_doc["calcs_reversed"][0][obj_key]
+
+            # remove the big object from all calcs_reversed
+            # this can catch situations were the drone added the data to more than one calc.
+            for i_calcs in range(len(task_doc["calcs_reversed"])):
+                if obj_key in task_doc["calcs_reversed"][i_calcs]:
+                    del task_doc["calcs_reversed"][i_calcs][obj_key]
             return calcs_r_data
 
-        # drop the data from the task_document and keep them in a separate dictionary (big_data_to_store)
-        if self._maggma_store_type is not None or use_gridfs:
+       # drop the data from the task_document and keep them in a separate dictionary (big_data_to_store)
+        if (
+            self._maggma_store_type is not None or use_gridfs
+        ) and "calcs_reversed" in task_doc:
             for data_key in OBJ_NAMES:
-                if data_key in task_doc.keys():
+                if data_key in task_doc["calcs_reversed"][0]:
                     big_data_to_store[data_key] = extract_from_calcs_reversed(data_key)
 
         # insert the task document
