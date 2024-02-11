@@ -135,7 +135,7 @@ class OpenmxToDb(FiretaskBase):
                 f.write(json.dumps(task_doc, default=DATETIME_HANDLER))
         else:
             mmdb = openmxCalcDb.from_db_file(db_file, admin=True)
-            print(f"task_doc: {task_doc.keys()}")
+            print(f"task_doc: {task_doc["calc_reversed"]} ")
             t_id = mmdb.insert_task(task_doc, 
                 use_gridfs=self.get("parse_out", True)
                 or bool(self.get("parse_scfout", True))
