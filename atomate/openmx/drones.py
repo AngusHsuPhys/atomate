@@ -250,7 +250,7 @@ class openmxDrone(AbstractDrone):
             d["calcs_reversed"] = [{}]
             for file_name, file_type in file_types:
                 if getattr(self, f'parse_{file_name.split(".")[-1]}'):
-                    d["calcs_reversed"][0].update(self.process_out(dir_name, file_name, file_type))
+                    d["calcs_reversed"][0].update(self.process_out(dir_name, file_name))
 
             d["last_updated"] = datetime.datetime.utcnow()
             return d
@@ -262,13 +262,13 @@ class openmxDrone(AbstractDrone):
             )
             raise
 
-    def process_out(self, dir_name, filename, taskname):
+    def process_out(self, dir_name, filename):
         f = os.path.join(dir_name, filename)
         with open(f, 'r', encoding='ISO-8859-1') as fp:
             data = fp.read()
         
         d = {}
-        d[f"{taskname}"] = data
+        d[f"{filename.split('.')[-1]}"] = data
         return d
 
     def process_vasprun(self, dir_name, taskname, filename):
