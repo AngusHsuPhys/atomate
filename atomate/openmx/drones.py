@@ -249,7 +249,7 @@ class openmxDrone(AbstractDrone):
 
             d["calcs_reversed"] = [{}]
             for file_name, file_type in file_types:
-                if getattr(self, f'parse_{file_name.split(".")[0]}'):
+                if getattr(self, f'parse_{file_name.split(".")[-1]}'):
                     d["calcs_reversed"][0].update(self.process_out(dir_name, file_name, file_type))
 
             d["last_updated"] = datetime.datetime.utcnow()
