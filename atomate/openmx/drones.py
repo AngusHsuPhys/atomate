@@ -237,14 +237,21 @@ class openmxDrone(AbstractDrone):
             d = jsanitize(self.additional_fields, strict=True)
             d["dir_name"] = fullpath
             openmx_out_file = os.path.join(fullpath, "openmx.out")
-            d["ase_calc"] = read_file(openmx_out_file)
 
-            # process output files
-            if self.parse_out:
-                d.update(self.process_out(dir_name, "openmx.out", "out"))
+            try:
+                d["ase_calc"] = read_file(openmx_out_file)
+                d["state"] = "successful"
+            except Exception:
+                logger.error(f"Error reading {openmx_out_file}")
+                raise
 
-            if self.parse_scfout:
-                d.update(self.process_out(dir_name, "openmx.scfout", "scfout"))
+            file_types = [("openmx.out", "standard"), ("openmx.scfout", "standard")]
+
+            d["calcs_reversed"] = [{}]
+            for file_name, file_type in file_types:
+                if getattr(self, f'parse_{file_name.split(".")[0]}'):
+                    d["calcs_reversed"][0].update(self.process_out(dir_name, file_name, file_type))
+
             d["last_updated"] = datetime.datetime.utcnow()
             return d
 
