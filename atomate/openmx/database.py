@@ -128,7 +128,7 @@ class openmxCalcDb(CalcDb):
         # drop the data from the task_document and keep them in a separate dictionary (big_data_to_store)
         if self._maggma_store_type is not None or use_gridfs:
             for data_key in OBJ_NAMES:
-                if data_key in task_doc[data_key]:
+                if data_key in task_doc.keys():
                     big_data_to_store[data_key] = extract_from_calcs_reversed(data_key)
 
         # insert the task document
