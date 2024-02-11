@@ -189,11 +189,13 @@ class openmxCalcDb(CalcDb):
             aeccar = self.get_aeccar(task_id)
             calc["aeccar0"] = aeccar["aeccar0"]
             calc["aeccar2"] = aeccar["aeccar2"]
-        if "out" in calc:
+        if "out_fs_id" in calc:
             out = self.get_openmx_output(task_id)
+            print(out)
             calc["out"] = out
-        if "scfout" in calc:
+        if "scfout_fs_id" in calc:
             scfout = self.get_openmx_scfout(task_id)
+            print(scfout)
             calc["scfout"] = scfout
         return task_doc
 
@@ -422,6 +424,10 @@ class openmxCalcDb(CalcDb):
         self.db.dos_boltztrap_fs.chunks.delete_many({})
         self.db.bandstructure_fs.files.delete_many({})
         self.db.bandstructure_fs.chunks.delete_many({})
+        self.db.out_fs.files.delete_many({})
+        self.db.out_fs.chunks.delete_many({})
+        self.db.scfout_fs.files.delete_many({})
+        self.db.scfout_fs.chunks.delete_many({})
         self.build_indexes()
 
 
