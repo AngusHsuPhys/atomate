@@ -270,8 +270,7 @@ class openmxDrone(AbstractDrone):
                 data = f.read()
         # if filename container ".scfout" then it is a binary file. Convert to something that can be dumped to json
         elif ".scfout" in filename:
-            with open(f, "rb") as f:
-                data = f.read()
+            data = f
 
 
         d = {}
