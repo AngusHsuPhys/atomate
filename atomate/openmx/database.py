@@ -229,8 +229,15 @@ class openmxCalcDb(CalcDb):
         oid = oid or ObjectId()
         compression_type = None
 
+        # Assuming `d` is a dictionary that might contain bytes objects
+        def bytes_to_str(obj):
+            if isinstance(obj, bytes):
+                import base64
+                return base64.b64encode(obj).decode('utf-8')
+            return obj
+        
         # always perform the string conversion when inserting directly to gridfs
-        d = json.dumps(d, cls=MontyEncoder)
+        d = json.dumps(d, cls=MontyEncoder, default=bytes_to_str)
         if compress:
             d = zlib.compress(d.encode(), compress)
             compression_type = "zlib"
