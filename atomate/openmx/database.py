@@ -146,14 +146,13 @@ class openmxCalcDb(CalcDb):
             if data_key == "scfout":
                 # use put_file_in_gridfs to store the scfout file
                 ## get CalcDb object here
-                fs_di_ = insert_file_in_gridfs(
+                fs_di_, compression_type_ = self.insert_file_in_gridfs(
                     data_val,
                     collection_name=f"{data_key}_fs", 
                     compress=True, 
                     compression_type="zlib",
                     task_id=t_id
                 )
-                compression_type_ = "zlib"
             else:
                 fs_di_, compression_type_ = self.insert_object(
                     use_gridfs=use_gridfs,
@@ -512,4 +511,4 @@ def insert_file_in_gridfs(
         m_data["task_id"] = task_id
     fs_id = fs.put(data, metadata=m_data)
 
-    return fs_id
+    return fs_id, compression_type
