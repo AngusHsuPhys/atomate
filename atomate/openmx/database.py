@@ -191,11 +191,9 @@ class openmxCalcDb(CalcDb):
             calc["aeccar2"] = aeccar["aeccar2"]
         if "out_fs_id" in calc:
             out = self.get_openmx_output(task_id)
-            print(out)
             calc["out"] = out
         if "scfout_fs_id" in calc:
             scfout = self.get_openmx_scfout(task_id)
-            print(scfout)
             calc["scfout"] = scfout
         return task_doc
 

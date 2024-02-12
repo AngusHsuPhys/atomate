@@ -272,10 +272,8 @@ class openmxDrone(AbstractDrone):
         elif ".scfout" in filename:
             with open(f, "rb") as f:
                 data = f.read()
-                import base64
-                data = base64.b64encode(data).decode('utf-8')
 
-        
+
         d = {}
         d[f"{filename.split('.')[-1]}"] = data
         return d
