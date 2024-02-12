@@ -145,6 +145,7 @@ class openmxCalcDb(CalcDb):
         for data_key, data_val in big_data_to_store.items():
             if data_key == "scfout":
                 # use put_file_in_gridfs to store the scfout file
+                print("type of self.db", type(self.db))
                 fs_di_ = put_file_in_gridfs(
                     data_val, self.db, 
                     collection_name=f"{data_key}_fs", 
