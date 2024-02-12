@@ -143,12 +143,23 @@ class openmxCalcDb(CalcDb):
 
         # upload the data to a particular location and store the reference to that location in the task database
         for data_key, data_val in big_data_to_store.items():
-            fs_di_, compression_type_ = self.insert_object(
-                use_gridfs=use_gridfs,
-                d=data_val,
-                collection=f"{data_key}_fs",
-                task_id=t_id,
-            )
+            if data_key == "scfout":
+                # use put_file_in_gridfs to store the scfout file
+                fs_di_ = put_file_in_gridfs(
+                    data_val, self.db, 
+                    collection_name=f"{data_key}_fs", 
+                    compress=True, 
+                    compression_type="zlib",
+                    task_id=t_id
+                )
+                compression_type_ = "zlib"
+            else:
+                fs_di_, compression_type_ = self.insert_object(
+                    use_gridfs=use_gridfs,
+                    d=data_val,
+                    collection=f"{data_key}_fs",
+                    task_id=t_id,
+                )
             self.collection.update_one(
                 {"task_id": t_id},
                 {
@@ -228,16 +239,9 @@ class openmxCalcDb(CalcDb):
         """
         oid = oid or ObjectId()
         compression_type = None
-
-        # Assuming `d` is a dictionary that might contain bytes objects
-        def bytes_to_str(obj):
-            if isinstance(obj, bytes):
-                import base64
-                return base64.b64encode(obj).decode('utf-8')
-            return obj
         
         # always perform the string conversion when inserting directly to gridfs
-        d = json.dumps(d, cls=MontyEncoder, default=bytes_to_str)
+        d = json.dumps(d, cls=MontyEncoder)
         if compress:
             d = zlib.compress(d.encode(), compress)
             compression_type = "zlib"
@@ -440,7 +444,7 @@ class openmxCalcDb(CalcDb):
 
 
 def put_file_in_gridfs(
-    file_path, db, collection_name=None, compress=False, compression_type=None
+    file_path, db, collection_name=None, compress=False, compression_type=None, task_id=None
 ):
     """
     Helper function to store a file in gridfs.
@@ -468,6 +472,9 @@ def put_file_in_gridfs(
     if collection_name is None:
         collection_name = db.collection
     fs = gridfs.GridFS(db.db, collection_name)
-    fs_id = fs.put(data, metadata={"compression": compression_type})
+    m_data = {"compression": compression_type}
+    if task_id:
+        m_data["task_id"] = task_id
+    fs_id = fs.put(data, metadata=m_data)
 
     return fs_id
