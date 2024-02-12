@@ -268,10 +268,13 @@ class openmxDrone(AbstractDrone):
         if ".out" in filename:
             with open(f, "r", encoding="ISO-8859-1") as f:
                 data = f.read()
-        # if filename container ".scfout" then it is a binary file
+        # if filename container ".scfout" then it is a binary file. Convert to something that can be dumped to json
         elif ".scfout" in filename:
             with open(f, "rb") as f:
                 data = f.read()
+                import base64
+                data = base64.b64encode(data).decode('utf-8')
+
         
         d = {}
         d[f"{filename.split('.')[-1]}"] = data
