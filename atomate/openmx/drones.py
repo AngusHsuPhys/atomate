@@ -264,8 +264,14 @@ class openmxDrone(AbstractDrone):
 
     def process_out(self, dir_name, filename):
         f = os.path.join(dir_name, filename)
-        with open(f, 'r', encoding='ISO-8859-1') as fp:
-            data = fp.read()
+        # if filename contains ".out" then it is a standard file, then use "'ISO-8859-1" encoding
+        if ".out" in filename:
+            with open(f, "r", encoding="ISO-8859-1") as f:
+                data = f.read()
+        # if filename container ".scfout" then it is a binary file
+        elif ".scfout" in filename:
+            with open(f, "rb") as f:
+                data = f.read()
         
         d = {}
         d[f"{filename.split('.')[-1]}"] = data
