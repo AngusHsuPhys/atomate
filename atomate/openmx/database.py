@@ -208,6 +208,42 @@ class openmxCalcDb(CalcDb):
             calc["scfout"] = scfout
         return task_doc
 
+    def insert_file_in_gridfs(
+        self, file_path, collection_name="fs", compress=True, compression_type=None, task_id=None
+    ):
+        """
+        Helper function to store a file in gridfs.
+
+        Args:
+            file_path (str):path to the files that should be saved.
+            db (CalcDb): the interface with the database.
+            collection_name (str): optionally modify the name of the collection
+                with respect to the one included in the db.
+            compress (bool): if True the file will be compressed with zlib.
+            compression_type (str): if file is already compressed defines the
+                compression type to be stored in the metadata.
+
+        Returns:
+            ObjectId: the mongodb id of the file that have been saved.
+        """
+
+        with open(file_path, "rb") as f:
+            data = f.read()
+
+        if compress:
+            data = zlib.compress(data, compress)
+            compression_type = "zlib"
+
+        if collection_name is None:
+            collection_name = "fs"
+        fs = gridfs.GridFS(self.db, collection_name)
+        m_data = {"compression": compression_type}
+        if task_id:
+            m_data["task_id"] = task_id
+        fs_id = fs.put(data, metadata=m_data)
+
+        return fs_id, compression_type
+
     def insert_object(self, use_gridfs, *args, **kwargs):
         """Insert the object into big object storage, try maggma_store if
             it is available, if not try storing directly to girdfs.
@@ -477,38 +513,3 @@ def put_file_in_gridfs(
     return fs_id
 
 
-def insert_file_in_gridfs(
-    self, file_path, collection_name="fs", compress=True, compression_type=None, task_id=None
-):
-    """
-    Helper function to store a file in gridfs.
-
-    Args:
-        file_path (str):path to the files that should be saved.
-        db (CalcDb): the interface with the database.
-        collection_name (str): optionally modify the name of the collection
-            with respect to the one included in the db.
-        compress (bool): if True the file will be compressed with zlib.
-        compression_type (str): if file is already compressed defines the
-            compression type to be stored in the metadata.
-
-    Returns:
-        ObjectId: the mongodb id of the file that have been saved.
-    """
-
-    with open(file_path, "rb") as f:
-        data = f.read()
-
-    if compress:
-        data = zlib.compress(data, compress)
-        compression_type = "zlib"
-
-    if collection_name is None:
-        collection_name = "fs"
-    fs = gridfs.GridFS(self.db, collection_name)
-    m_data = {"compression": compression_type}
-    if task_id:
-        m_data["task_id"] = task_id
-    fs_id = fs.put(data, metadata=m_data)
-
-    return fs_id, compression_type
