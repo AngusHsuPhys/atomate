@@ -365,8 +365,7 @@ class openmxCalcDb(CalcDb):
             return obj_dict
         else:
             fs = gridfs.GridFS(self.db, f"{key}_fs")
-            bs_json = zlib.decompress(fs.get(fs_id).read())
-            obj_dict = json.loads(bs_json.decode())
+            obj_dict = zlib.decompress(fs.get(fs_id).read())
         return obj_dict
     
     def get_openmx_output(self, task_id):
