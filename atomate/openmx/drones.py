@@ -245,10 +245,10 @@ class openmxDrone(AbstractDrone):
                 logger.error(f"Error reading {openmx_out_file}")
                 raise
 
-            file_types = [("openmx.out", "standard"), ("openmx.scfout", "standard")]
+            file_types = ["openmx.out", "openmx.scfout"]
 
             d["calcs_reversed"] = [{}]
-            for file_name, file_type in file_types:
+            for file_name in file_types:
                 if getattr(self, f'parse_{file_name.split(".")[-1]}'):
                     d["calcs_reversed"][0].update(self.process_out(dir_name, file_name))
 
@@ -265,14 +265,14 @@ class openmxDrone(AbstractDrone):
     def process_out(self, dir_name, filename):
         f = os.path.join(dir_name, filename)
         # if filename contains ".out" then it is a standard file, then use "'ISO-8859-1" encoding
-        if ".out" in filename:
-            with open(f, "r", encoding="ISO-8859-1") as f:
-                data = f.read()
+        # if ".out" in filename:
+        #     with open(f, "r", encoding="ISO-8859-1") as f:
+        #         data = f.read()
         # if filename container ".scfout" then it is a binary file. Convert to something that can be dumped to json
-        elif ".scfout" in filename:
-            data = f
+        # elif ".scfout" in filename:
+        data = f
 
-
+ 
         d = {}
         d[f"{filename.split('.')[-1]}"] = data
         return d
