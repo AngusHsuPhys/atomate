@@ -143,7 +143,7 @@ class openmxCalcDb(CalcDb):
 
         # upload the data to a particular location and store the reference to that location in the task database
         for data_key, data_val in big_data_to_store.items():
-            if data_key == "scfout":
+            if data_key in ("out", "scfout"):
                 # use put_file_in_gridfs to store the scfout file
                 ## get CalcDb object here
                 fs_di_, compression_type_ = self.insert_file_in_gridfs(
