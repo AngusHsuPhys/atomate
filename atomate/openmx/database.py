@@ -201,10 +201,10 @@ class openmxCalcDb(CalcDb):
             calc["aeccar0"] = aeccar["aeccar0"]
             calc["aeccar2"] = aeccar["aeccar2"]
         if "out_fs_id" in calc:
-            out = self.get_openmx_output(task_id)
+            out = self.get_openmx_output(task_id, key="out")
             calc["out"] = out
         if "scfout_fs_id" in calc:
-            scfout = self.get_openmx_output(task_id)
+            scfout = self.get_openmx_output(task_id, key="scfout")
             calc["scfout"] = scfout
         return task_doc
 
@@ -368,7 +368,7 @@ class openmxCalcDb(CalcDb):
             obj_dict = zlib.decompress(fs.get(fs_id).read())
         return obj_dict
     
-    def get_openmx_output(self, task_id):
+    def get_openmx_output(self, task_id, key):
         """
         Read the OUT data into a dictionary
 
@@ -377,7 +377,7 @@ class openmxCalcDb(CalcDb):
         Returns:
             dict: the OUT data
         """
-        obj = self.get_data_from_maggma_or_gridfs(task_id, key="out")
+        obj = self.get_data_from_maggma_or_gridfs(task_id, key=key)
         return obj
 
     def get_band_structure(self, task_id):
