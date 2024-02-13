@@ -204,7 +204,7 @@ class openmxCalcDb(CalcDb):
             out = self.get_openmx_output(task_id)
             calc["out"] = out
         if "scfout_fs_id" in calc:
-            scfout = self.get_openmx_scfout(task_id)
+            scfout = self.get_openmx_output(task_id)
             calc["scfout"] = scfout
         return task_doc
 
@@ -377,20 +377,8 @@ class openmxCalcDb(CalcDb):
         Returns:
             dict: the OUT data
         """
-        obj_dict = self.get_data_from_maggma_or_gridfs(task_id, key="out")
-        return obj_dict
-    
-    def get_openmx_scfout(self, task_id):
-        """
-        Read the SCFOUT data into a dictionary
-
-        Args:
-            task_id(int or str): the task_id containing the data
-        Returns:
-            dict: the SCFOUT data
-        """
-        obj_dict = self.get_data_from_maggma_or_gridfs(task_id, key="scfout")
-        return obj_dict
+        obj = self.get_data_from_maggma_or_gridfs(task_id, key="out")
+        return obj
 
     def get_band_structure(self, task_id):
         """
