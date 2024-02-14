@@ -135,6 +135,7 @@ class openmxDrone(AbstractDrone):
         use_full_uri=True,
         parse_out=True,
         parse_scfout=True,
+        parse_deeph=False,
         store_volumetric_data=STORE_VOLUMETRIC_DATA,
         store_additional_json=STORE_ADDITIONAL_JSON,
     ):
@@ -172,6 +173,7 @@ class openmxDrone(AbstractDrone):
         self.store_additional_json = store_additional_json
         self.parse_out = parse_out
         self.parse_scfout = parse_scfout
+        self.parse_deeph = parse_deeph
 
     def assimilate(self, path):
         """
@@ -245,12 +247,28 @@ class openmxDrone(AbstractDrone):
                 logger.error(f"Error reading {openmx_out_file}")
                 raise
 
-            file_types = ["openmx.out", "openmx.scfout"]
-
             d["calcs_reversed"] = [{}]
-            for file_name in file_types:
+            for file_name in ["openmx.out", "openmx.scfout"]:
                 if getattr(self, f'parse_{file_name.split(".")[-1]}'):
                     d["calcs_reversed"][0].update(self.process_out(dir_name, file_name))
+
+            # if self.parse_deeph is true, parse the deeph file
+            if self.parse_deeph:
+                deeph_base_dir = os.path.join(fullpath, "deeph", "processed_dir")
+                # check if deeph_base_dir exists and does not contain error.log file
+                if os.path.exists(deeph_base_dir) and not os.path.exists(os.path.join(deeph_base_dir, "error.log")):
+                    # read info.json file and convert to dict
+                    with open(os.path.join(deeph_base_dir, "info.json"), "r") as f:
+                        d["deeph"] = json.load(f)
+                    #scan the deeph_base_dir for deeph files and update the calcs_reversed with the output of process_out
+                    for file_name in os.listdir(deeph_base_dir):
+                        # escape info.json file
+                        if file_name != "info.json":
+                            d["calcs_reversed"][0].update(self.process_out(deeph_base_dir, file_name))
+                else:
+                    logger.error(f"deeph_base_dir {deeph_base_dir} does not exist")
+                    raise ValueError(f"deeph_base_dir {deeph_base_dir} does not exist")
+
 
             d["last_updated"] = datetime.datetime.utcnow()
             return d
@@ -271,10 +289,9 @@ class openmxDrone(AbstractDrone):
         # if filename container ".scfout" then it is a binary file. Convert to something that can be dumped to json
         # elif ".scfout" in filename:
         data = f
-
- 
         d = {}
-        d[f"{filename.split('.')[-1]}"] = data
+        # replace dots in filename with underscores to avoid mongo issues
+        d[f"{filename.replace('.', '_')}"] = data
         return d
 
     def process_vasprun(self, dir_name, taskname, filename):
