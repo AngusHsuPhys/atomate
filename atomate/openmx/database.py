@@ -460,9 +460,7 @@ class openmxCalcDb(CalcDb):
         self.db.bandstructure_fs.files.delete_many({})
         self.db.bandstructure_fs.chunks.delete_many({})
 
-        for coll in ["openmx_out", "openmx_scfout", "element_dat", "hamiltonians_h5", 
-                     "lat_dat", "orbital_types_dat"
-                     "rc_h5", "rh_h5", "rlat_dat", "R_list_dat", "site_positions_dat"]:
+        for coll in OBJ_NAMES:
             self.db[f"{coll}_fs"].files.delete_many({})
             self.db[f"{coll}_fs"].chunks.delete_many({})
 
