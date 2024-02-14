@@ -72,7 +72,7 @@ class WriteOpenmxFromIOSet(FiretaskBase):
         ase_calc = OpenMX(label="openmx", **vis.as_dict())
         ase_calc.write_input(atoms)
 
-        self.structure.write("POSCAR")
+        self["structure"].to(fmt="POSCAR", filename="POSCAR")
 
 
 
