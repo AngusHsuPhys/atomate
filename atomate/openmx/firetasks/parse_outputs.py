@@ -97,7 +97,7 @@ class OpenmxToDb(FiretaskBase):
         "task_fields_to_push",
         "parse_out",
         "parse_scfout",
-        "parse_deeph"
+        "parse_deeph",
         "store_volumetric_data",
     ]
 
