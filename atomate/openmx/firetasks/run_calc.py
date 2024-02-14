@@ -64,6 +64,27 @@ class RunOpenmx(FiretaskBase):
         return_code = subprocess.call(cmd, shell=True)
         logger.info(f"Command {cmd} finished running with returncode: {return_code}")
 
+@explicit_serialize
+class RunDeephPreprocess(FiretaskBase):
+    """
+    Execute a command directly (no custodian).
+
+    Required params:
+        cmd (str): the name of the full executable to run. Supports env_chk.
+    Optional params:
+        expand_vars (str): Set to true to expand variable names in the cmd.
+    """
+
+    required_params = ["deeph_preprocess_cmd"]
+    # optional_params = ["openmx_input_file", "openmx_output_file"]
+
+    def run_task(self, fw_spec):
+        cmd = env_chk(self["deeph_preprocess_cmd"], fw_spec)
+        # cmd += f" main `pwd`"
+
+        logger.info(f"Running command: {cmd}")
+        return_code = subprocess.call(cmd, shell=True)
+        logger.info(f"Command {cmd} finished running with returncode: {return_code}")
 
 @explicit_serialize
 class RunVaspCustodian(FiretaskBase):
