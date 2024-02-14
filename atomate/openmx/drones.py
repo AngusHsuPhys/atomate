@@ -238,6 +238,9 @@ class openmxDrone(AbstractDrone):
             fullpath = os.path.abspath(dir_name)
             d = jsanitize(self.additional_fields, strict=True)
             d["dir_name"] = fullpath
+            st = Structure.from_file(os.path.join(fullpath, "POSCAR"))
+            d["pmg_structure"] = st.as_dict()
+            d["formula"] = st.formula
             openmx_out_file = os.path.join(fullpath, "openmx.out")
 
             try:
