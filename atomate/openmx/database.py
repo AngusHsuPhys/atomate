@@ -457,9 +457,6 @@ class openmxCalcDb(CalcDb):
 
 
     def reset(self):
-        if self.admin is False:
-            raise ValueError("You must be an admin to reset the database!")
-    
         self.collection.delete_many({})
         self.db.counter.delete_one({"_id": "taskid"})
         self.db.counter.insert_one({"_id": "taskid", "c": 0})
