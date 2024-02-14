@@ -60,6 +60,7 @@ class WriteOpenmxFromIOSet(FiretaskBase):
         vis = vis_cls(self["structure"], **input_params)
 
         atoms = AseAtomsAdaptor.get_atoms(self["structure"])
+
         atoms.set_initial_magnetic_moments(self.get("magmoms", None) or [0] * len(atoms))
 
         os.environ["OPENMX_DFT_DATA_PATH"] = env_chk(self["openmx_dft_data_path"], fw_spec)
@@ -71,6 +72,7 @@ class WriteOpenmxFromIOSet(FiretaskBase):
         ase_calc = OpenMX(label="openmx", **vis.as_dict())
         ase_calc.write_input(atoms)
 
+        self.structure.write("POSCAR")
 
 
 
