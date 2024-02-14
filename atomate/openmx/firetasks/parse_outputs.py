@@ -97,6 +97,7 @@ class OpenmxToDb(FiretaskBase):
         "task_fields_to_push",
         "parse_out",
         "parse_scfout",
+        "parse_deeph"
         "store_volumetric_data",
     ]
 
@@ -115,6 +116,7 @@ class OpenmxToDb(FiretaskBase):
             additional_fields=self.get("additional_fields"),
             parse_out = self.get("parse_out", True),
             parse_scfout = self.get("parse_scfout", True),
+            parse_deeph=self.get("parse_deeph", False),
             store_volumetric_data=self.get(
                 "store_volumetric_data", STORE_VOLUMETRIC_DATA
             ),
