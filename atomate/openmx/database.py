@@ -28,10 +28,13 @@ __email__ = "kmathew@lbl.gov"
 
 logger = get_logger(__name__)
 # If we use Maggmastores  we will have to initialize a magmma store for each object typl
-OBJ_NAMES = (
-    "out",
-    "scfout"
-)
+OBJ_NAMES = ()
+
+
+for coll in ["openmx_out", "openmx_scfout", "element_dat", "hamiltonians_h5", 
+                "lat_dat", "orbital_types_dat"
+                "rc_h5", "rh_h5", "rlat_dat", "R_list_dat", "site_positions_dat"]:
+    OBJ_NAMES += (f"{coll}",)
 
 
 class openmxCalcDb(CalcDb):
@@ -143,7 +146,7 @@ class openmxCalcDb(CalcDb):
 
         # upload the data to a particular location and store the reference to that location in the task database
         for data_key, data_val in big_data_to_store.items():
-            if data_key in ("out", "scfout"):
+            if data_key in OBJ_NAMES:
                 # use put_file_in_gridfs to store the scfout file
                 ## get CalcDb object here
                 fs_di_, compression_type_ = self.insert_file_in_gridfs(
@@ -200,12 +203,13 @@ class openmxCalcDb(CalcDb):
             aeccar = self.get_aeccar(task_id)
             calc["aeccar0"] = aeccar["aeccar0"]
             calc["aeccar2"] = aeccar["aeccar2"]
-        if "out_fs_id" in calc:
-            out = self.get_openmx_output(task_id, key="out")
-            calc["out"] = out
-        if "scfout_fs_id" in calc:
-            scfout = self.get_openmx_output(task_id, key="scfout")
-            calc["scfout"] = scfout
+
+        for coll in ["openmx_out", "openmx_scfout", "element_dat", "hamiltonians_h5", 
+                     "lat_dat", "orbital_types_dat"
+                     "rc_h5", "rh_h5", "rlat_dat", "R_list_dat", "site_positions_dat"]:
+            if f"{coll}_fs_id" in calc:
+                data = self.get_data_from_maggma_or_gridfs(task_id, key=f"{coll}")
+                calc[f"{coll}"] = data
         return task_doc
 
     def insert_file_in_gridfs(
@@ -456,10 +460,13 @@ class openmxCalcDb(CalcDb):
         self.db.dos_boltztrap_fs.chunks.delete_many({})
         self.db.bandstructure_fs.files.delete_many({})
         self.db.bandstructure_fs.chunks.delete_many({})
-        self.db.out_fs.files.delete_many({})
-        self.db.out_fs.chunks.delete_many({})
-        self.db.scfout_fs.files.delete_many({})
-        self.db.scfout_fs.chunks.delete_many({})
+
+        for coll in ["openmx_out", "openmx_scfout", "element_dat", "hamiltonians_h5", 
+                     "lat_dat", "orbital_types_dat"
+                     "rc_h5", "rh_h5", "rlat_dat", "R_list_dat", "site_positions_dat"]:
+            self.db[f"{coll}_fs"].files.delete_many({})
+            self.db[f"{coll}_fs"].chunks.delete_many({})
+
         self.build_indexes()
 
 
