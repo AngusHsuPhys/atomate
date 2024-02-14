@@ -30,9 +30,8 @@ logger = get_logger(__name__)
 # If we use Maggmastores  we will have to initialize a magmma store for each object typl
 OBJ_NAMES = ()
 
-
 for coll in ["openmx_out", "openmx_scfout", "element_dat", "hamiltonians_h5", 
-                "lat_dat", "orbital_types_dat"
+                "lat_dat", "orbital_types_dat",
                 "rc_h5", "rh_h5", "rlat_dat", "R_list_dat", "site_positions_dat"]:
     OBJ_NAMES += (f"{coll}",)
 
@@ -141,7 +140,7 @@ class openmxCalcDb(CalcDb):
                 if data_key in task_doc["calcs_reversed"][0]:
                     big_data_to_store[data_key] = extract_from_calcs_reversed(data_key)
 
-        # insert the task document
+        # insert the task documentdocument
         t_id = self.insert(task_doc)
 
         # upload the data to a particular location and store the reference to that location in the task database
