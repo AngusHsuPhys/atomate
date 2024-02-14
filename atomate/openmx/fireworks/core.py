@@ -25,7 +25,7 @@ from atomate.openmx.config import (
 from atomate.openmx.firetasks.glue_tasks import CopyVaspOutputs, pass_vasp_result
 
 from atomate.openmx.firetasks.parse_outputs import OpenmxToDb, OpenmxJsonToDb
-from atomate.openmx.firetasks.run_calc import RunOpenmx
+from atomate.openmx.firetasks.run_calc import RunOpenmx, RunDeephPreprocess
 from atomate.openmx.firetasks.write_inputs import (
     ModifyIncar,
     WriteNormalmodeDisplacedPoscar,
@@ -62,6 +62,9 @@ class OpenmxScfFW(Firework):
         # output_file=OPENMX_OUTPUT_FILE,
 
         db_file=DB_FILE,
+
+        run_deeph_preprocess=False,
+        deeph_preprocess_cmd=">>deeph_preprocess_cmd<<",
         parents=None,
         **kwargs,
     ):
@@ -105,8 +108,15 @@ class OpenmxScfFW(Firework):
                 # output_file=output_file,            
             )
         )
+
+        parse_deeph = False
+        if run_deeph_preprocess:
+            t.append(RunDeephPreprocess(deeph_preprocess_cmd=deeph_preprocess_cmd))
+            parse_deeph = True
+
         t.append(PassCalcLocs(name=name))
-        t.append(OpenmxToDb(db_file=db_file, additional_fields={"task_label": name}))
+
+        t.append(OpenmxToDb(db_file=db_file, additional_fields={"task_label": name}, parse_deeph=parse_deeph))
         super().__init__(
             t,
             parents=parents,
