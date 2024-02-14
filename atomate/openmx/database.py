@@ -28,12 +28,20 @@ __email__ = "kmathew@lbl.gov"
 
 logger = get_logger(__name__)
 # If we use Maggmastores  we will have to initialize a magmma store for each object typl
-OBJ_NAMES = ()
 
-for coll in ["openmx_out", "openmx_scfout", "element_dat", "hamiltonians_h5", 
-                "lat_dat", "orbital_types_dat",
-                "rc_h5", "rh_h5", "rlat_dat", "R_list_dat", "site_positions_dat"]:
-    OBJ_NAMES += (f"{coll}",)
+collections = [
+    "element_dat",
+    "hamiltonians_h5",
+    "lat_dat",
+    "orbital_types_dat",
+    "rc_h5",
+    "rh_h5",
+    "rlat_dat",
+    "R_list_dat",
+    "site_positions_dat",
+]
+
+OBJ_NAMES = tuple(coll for coll in collections)
 
 
 class openmxCalcDb(CalcDb):
