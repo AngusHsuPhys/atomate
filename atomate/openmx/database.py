@@ -30,6 +30,8 @@ logger = get_logger(__name__)
 # If we use Maggmastores  we will have to initialize a magmma store for each object typl
 
 collections = [
+    "openmx_out",
+    "openmx_scfout",
     "element_dat",
     "hamiltonians_h5",
     "lat_dat",
