@@ -41,6 +41,7 @@ collections = [
     "rlat_dat",
     "R_list_dat",
     "site_positions_dat",
+    "HGraph-openmx-rFromDFT-edge=Aij_pkl",
 ]
 
 OBJ_NAMES = tuple(coll for coll in collections)
