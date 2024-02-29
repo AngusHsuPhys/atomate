@@ -277,9 +277,6 @@ class openmxDrone(AbstractDrone):
                 deephe3_base_dir = os.path.join(fullpath, "deeph", "save_graph_dir")
                 # check if deeph_base_dir exists and does not contain error.log file
                 if os.path.exists(deephe3_base_dir) and not os.path.exists(os.path.join(deephe3_base_dir, "error.log")):
-                    # read info.json file and convert to dict
-                    with open(os.path.join(deephe3_base_dir, "info.json"), "r") as f:
-                        d["deephe3"] = json.load(f)
                     #scan the deeph_base_dir for deeph files and update the calcs_reversed with the output of process_out
                     for file_name in os.listdir(deephe3_base_dir):
                         # escape info.json file
