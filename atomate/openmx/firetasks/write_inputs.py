@@ -58,6 +58,10 @@ class WriteOpenmxFromIOSet(FiretaskBase):
             input_params.update({"potcar_spec": self["potcar_spec"]})
 
         vis = vis_cls(self["structure"], **input_params)
+        vis_dict = vis.as_dict()
+        if self.get("potcar_spec", False):
+            #remove potcar_spec from the dict
+            vis_dict.pop("potcar_spec", None)
 
         atoms = AseAtomsAdaptor.get_atoms(self["structure"])
 
@@ -69,7 +73,7 @@ class WriteOpenmxFromIOSet(FiretaskBase):
         # print env OPENMX_DFT_DATA_PATH
         print(f"OPENMX_DFT_DATA_PATH: {os.environ['OPENMX_DFT_DATA_PATH']}")
 
-        ase_calc = OpenMX(label="openmx", **vis.as_dict())
+        ase_calc = OpenMX(label="openmx", **vis_dict)
         ase_calc.write_input(atoms)
 
         self["structure"].to(fmt="POSCAR", filename="POSCAR")
