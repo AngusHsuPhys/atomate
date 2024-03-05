@@ -63,6 +63,8 @@ class RunOpenmx(FiretaskBase):
         logger.info(f"Running command: {cmd}")
         return_code = subprocess.call(cmd, shell=True)
         logger.info(f"Command {cmd} finished running with returncode: {return_code}")
+        if return_code != 0:
+            raise RuntimeError(f"OpenMX returned non-zero exit status: {return_code}")
 
 @explicit_serialize
 class RunDeephPreprocess(FiretaskBase):
@@ -85,6 +87,8 @@ class RunDeephPreprocess(FiretaskBase):
         logger.info(f"Running command: {cmd}")
         return_code = subprocess.call(cmd, shell=True)
         logger.info(f"Command {cmd} finished running with returncode: {return_code}")
+        if return_code != 0:
+            raise RuntimeError(f"Deeph Preprocess returned non-zero exit status: {return_code}")
 
 @explicit_serialize
 class RunVaspCustodian(FiretaskBase):
