@@ -55,7 +55,7 @@ class WriteOpenmxFromIOSet(FiretaskBase):
 
         input_params = self.get("openmx_input_params", {})
         if self.get("potcar_spec", False):
-            input_params.update({"definition_of_atomic_species": self.get("potcar_spec")})
+            input_params.update({"potcar_spec": self["potcar_spec"]})
 
         vis = vis_cls(self["structure"], **input_params)
 
