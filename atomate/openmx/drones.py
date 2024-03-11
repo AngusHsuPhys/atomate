@@ -138,6 +138,7 @@ class openmxDrone(AbstractDrone):
         parse_deeph=False,
         store_volumetric_data=STORE_VOLUMETRIC_DATA,
         store_additional_json=STORE_ADDITIONAL_JSON,
+        parse_resume=True,
     ):
         """
         Initialize a Vasp drone to parse VASP outputs
@@ -174,6 +175,7 @@ class openmxDrone(AbstractDrone):
         self.parse_out = parse_out
         self.parse_scfout = parse_scfout
         self.parse_deeph = parse_deeph
+        self.parse_resume = parse_resume
 
     def assimilate(self, path):
         """
@@ -253,7 +255,8 @@ class openmxDrone(AbstractDrone):
             d["calcs_reversed"] = [{}]
             for file_name in ["openmx.out", "openmx.scfout"]:
                 if getattr(self, f'parse_{file_name.split(".")[-1]}'):
-                    d["calcs_reversed"][0].update(self.process_out(dir_name, file_name))
+                    # d["calcs_reversed"][0].update(self.process_out(dir_name, file_name))
+                    d["calcs_reversed"][0].update({"openmx_raw": self.process_out(dir_name, file_name)})
 
             # if self.parse_deeph is true, parse the deeph file
             if self.parse_deeph:
@@ -268,23 +271,23 @@ class openmxDrone(AbstractDrone):
                     for file_name in os.listdir(deeph_base_dir):
                         # escape info.json file
                         if file_name != "info.json":
-                            d["calcs_reversed"][0].update(self.process_out(deeph_base_dir, file_name))
+                            # d["calcs_reversed"][0].update(self.process_out(deeph_base_dir, file_name))
+                            d["calcs_reversed"][0].update({"deeph_raw": self.process_out(deeph_base_dir, file_name)})
                 else:
                     logger.error(f"deeph_base_dir {deeph_base_dir} does not exist")
                     raise ValueError(f"deeph_base_dir {deeph_base_dir} does not exist")
 
 
-                deephe3_base_dir = os.path.join(fullpath, "deeph", "save_graph_dir")
-                # check if deeph_base_dir exists and does not contain error.log file
-                if os.path.exists(deephe3_base_dir) and not os.path.exists(os.path.join(deephe3_base_dir, "error.log")):
-                    #scan the deeph_base_dir for deeph files and update the calcs_reversed with the output of process_out
-                    for file_name in os.listdir(deephe3_base_dir):
-                        # escape info.json file
-                        if file_name != "info.json":
-                            d["calcs_reversed"][0].update(self.process_out(deephe3_base_dir, file_name))
+            if self.parse_resume:
+                rst_dir = os.path.join(fullpath, "openmx_rst")
+                # check if the folder exists
+                if os.path.exists(rst_dir):
+                    for file_name in os.listdir(rst_dir):
+                        # d["calcs_reversed"][0].update(self.process_out(rst_dir, file_name))
+                        d["calcs_reversed"][0].update({"openmx_rst": self.process_out(rst_dir, file_name)})
                 else:
-                    logger.error(f"deeph_base_dir {deephe3_base_dir} does not exist")
-                    raise ValueError(f"deeph_base_dir {deephe3_base_dir} does not exist")
+                    logger.error(f"rst_dir {rst_dir} does not exist")
+                    raise ValueError(f"rst_dir {rst_dir} does not exist")
 
 
             d["last_updated"] = datetime.datetime.utcnow()

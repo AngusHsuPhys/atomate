@@ -66,6 +66,7 @@ class OpenmxScfFW(Firework):
         run_deeph_preprocess=False,
         deeph_preprocess_cmd=">>deeph_preprocess_cmd<<",
         parents=None,
+        parse_resume=True,
         **kwargs,
     ):
         """
@@ -116,7 +117,7 @@ class OpenmxScfFW(Firework):
 
         t.append(PassCalcLocs(name=name))
 
-        t.append(OpenmxToDb(db_file=db_file, additional_fields={"task_label": name}, parse_deeph=parse_deeph))
+        t.append(OpenmxToDb(db_file=db_file, additional_fields={"task_label": name}, parse_deeph=parse_deeph, parse_resume=parse_resume))
         super().__init__(
             t,
             parents=parents,

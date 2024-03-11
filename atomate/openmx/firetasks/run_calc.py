@@ -63,8 +63,15 @@ class RunOpenmx(FiretaskBase):
         logger.info(f"Running command: {cmd}")
         return_code = subprocess.call(cmd, shell=True)
         logger.info(f"Command {cmd} finished running with returncode: {return_code}")
-        if return_code != 0:
-            raise RuntimeError(f"OpenMX returned non-zero exit status: {return_code}")
+
+        # set the state by checking the output file "stat" and check if "The calculation was normally finished." is in it.
+        with open("stat", "r") as f:
+            if "The calculation was normally finished." in f.read():
+                return FWAction(stored_data={"state": "successful"})
+            else:
+                raise RuntimeError(f"State of the calculation is not successful. Please check the output file 'stat' for more information.")
+
+
 
 @explicit_serialize
 class RunDeephPreprocess(FiretaskBase):

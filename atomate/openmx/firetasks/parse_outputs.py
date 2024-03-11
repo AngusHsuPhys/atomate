@@ -99,6 +99,7 @@ class OpenmxToDb(FiretaskBase):
         "parse_scfout",
         "parse_deeph",
         "store_volumetric_data",
+        "parse_resume"
     ]
 
     def run_task(self, fw_spec):
@@ -140,7 +141,8 @@ class OpenmxToDb(FiretaskBase):
             t_id = mmdb.insert_task(task_doc, 
                 use_gridfs=self.get("parse_out", True)
                 or bool(self.get("parse_scfout", True))
-                or bool(self.get("store_volumetric_data", STORE_VOLUMETRIC_DATA)),
+                or bool(self.get("store_volumetric_data", STORE_VOLUMETRIC_DATA))
+                or bool(self.get("parse_resume", True)),
             )
             logger.info(f"Finished parsing with task_id: {t_id}")
 

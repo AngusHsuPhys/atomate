@@ -46,6 +46,9 @@ collections = [
 
 OBJ_NAMES = tuple(coll for coll in collections)
 
+OBJ_NAMES = ("openmx_raw", "deeph_raw", "openmx_rst")
+
+
 
 class openmxCalcDb(CalcDb):
     """
@@ -155,35 +158,28 @@ class openmxCalcDb(CalcDb):
         t_id = self.insert(task_doc)
 
         # upload the data to a particular location and store the reference to that location in the task database
-        for data_key, data_val in big_data_to_store.items():
-            if data_key in OBJ_NAMES:
+        for dir_key, data in big_data_to_store.items():
+            if dir_key in OBJ_NAMES:
+                for data_key, data_val in data.items():
                 # use put_file_in_gridfs to store the scfout file
                 ## get CalcDb object here
-                fs_di_, compression_type_ = self.insert_file_in_gridfs(
-                    data_val,
-                    collection_name=f"{data_key}_fs", 
-                    compress=True, 
-                    compression_type="zlib",
-                    task_id=t_id
-                )
+                    fs_di_, compression_type_ = self.insert_file_in_gridfs(
+                        data_val,
+                        collection_name="raw_data_fs",#f"{data_key}_fs", 
+                        compress=True, 
+                        compression_type="zlib",
+                        task_id=t_id
+                    )
             else:
-                fs_di_, compression_type_ = self.insert_object(
-                    use_gridfs=use_gridfs,
-                    d=data_val,
-                    collection=f"{data_key}_fs",
-                    task_id=t_id,
-                )
+                raise ValueError(f"Unknown data_key {data_key} to store in gridfs")
+            
             self.collection.update_one(
                 {"task_id": t_id},
-                {
-                    "$set": {
-                        f"calcs_reversed.0.{data_key}_compression": compression_type_
-                    }
-                },
+                {"$set": {f"calcs_reversed.0.{dir_key}.{data_key}_compression": compression_type_}},
             )
             self.collection.update_one(
                 {"task_id": t_id},
-                {"$set": {f"calcs_reversed.0.{data_key}_fs_id": fs_di_}},
+                {"$set": {f"calcs_reversed.0.{dir_key}.{data_key}_fs_id": fs_di_}},
             )
         return t_id
 
