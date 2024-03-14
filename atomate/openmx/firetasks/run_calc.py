@@ -67,6 +67,7 @@ class RunOpenmx(FiretaskBase):
         # set the state by checking the output file "stat" and check if "The calculation was normally finished." is in it.
         with open("stat", "r") as f:
             if "The calculation was normally finished." in f.read():
+                print("The calculation was normally finished.")
                 return FWAction(stored_data={"state": "successful"})
             else:
                 raise RuntimeError(f"State of the calculation is not successful. Please check the output file 'stat' for more information.")
