@@ -256,7 +256,12 @@ class openmxDrone(AbstractDrone):
             for file_name in ["openmx.out", "openmx.scfout"]:
                 if getattr(self, f'parse_{file_name.split(".")[-1]}'):
                     # d["calcs_reversed"][0].update(self.process_out(dir_name, file_name))
-                    d["calcs_reversed"][0].update({"openmx_raw": self.process_out(dir_name, file_name)})
+                    # "openmx_raw" can be not exist in d["calcs_reversed"][0], make sure it is updated
+                    if "openmx_raw" in d["calcs_reversed"][0]:
+                        d["calcs_reversed"][0]["openmx_raw"].update(self.process_out(fullpath, file_name))
+                    else:
+                        d["calcs_reversed"][0]["openmx_raw"] = self.process_out(fullpath, file_name)
+
 
             # if self.parse_deeph is true, parse the deeph file
             if self.parse_deeph:
@@ -272,7 +277,10 @@ class openmxDrone(AbstractDrone):
                         # escape info.json file
                         if file_name != "info.json":
                             # d["calcs_reversed"][0].update(self.process_out(deeph_base_dir, file_name))
-                            d["calcs_reversed"][0].update({"deeph_raw": self.process_out(deeph_base_dir, file_name)})
+                            if "deeph_raw" in d["calcs_reversed"][0]:
+                                d["calcs_reversed"][0]["deeph_raw"].update(self.process_out(deeph_base_dir, file_name))
+                            else:
+                                d["calcs_reversed"][0]["deeph_raw"] = self.process_out(deeph_base_dir, file_name)
                 else:
                     logger.error(f"deeph_base_dir {deeph_base_dir} does not exist")
                     raise ValueError(f"deeph_base_dir {deeph_base_dir} does not exist")
@@ -284,7 +292,10 @@ class openmxDrone(AbstractDrone):
                 if os.path.exists(rst_dir):
                     for file_name in os.listdir(rst_dir):
                         # d["calcs_reversed"][0].update(self.process_out(rst_dir, file_name))
-                        d["calcs_reversed"][0].update({"openmx_rst": self.process_out(rst_dir, file_name)})
+                        if "openmx_rst" in d["calcs_reversed"][0]:
+                            d["calcs_reversed"][0]["openmx_rst"].update(self.process_out(rst_dir, file_name))
+                        else:
+                            d["calcs_reversed"][0]["openmx_rst"] = self.process_out(rst_dir, file_name)
                 else:
                     logger.error(f"rst_dir {rst_dir} does not exist")
                     raise ValueError(f"rst_dir {rst_dir} does not exist")
