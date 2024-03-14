@@ -131,28 +131,28 @@ class openmxCalcDb(CalcDb):
 
         big_data_to_store = {}
 
-        def extract_from_calcs_reversed(obj_key):
+        def extract_from_calcs_reversed(dir_key):
             """
             Grab the data from calcs_reversed.0.obj_key and store on gridfs directly or some Maggma store
             Args:
                 obj_key: Key of the data in calcs_reversed.0 to store
             """
-            calcs_r_data = task_doc["calcs_reversed"][0][obj_key]
+            calcs_r_data = task_doc["calcs_reversed"][0][dir_key]
 
             # remove the big object from all calcs_reversed
             # this can catch situations were the drone added the data to more than one calc.
             for i_calcs in range(len(task_doc["calcs_reversed"])):
-                if obj_key in task_doc["calcs_reversed"][i_calcs].keys():
-                    del task_doc["calcs_reversed"][i_calcs][obj_key]
+                if dir_key in task_doc["calcs_reversed"][i_calcs].keys():
+                    del task_doc["calcs_reversed"][i_calcs][dir_key]
             return calcs_r_data
 
        # drop the data from the task_document and keep them in a separate dictionary (big_data_to_store)
         if (
             self._maggma_store_type is not None or use_gridfs
         ) and "calcs_reversed" in task_doc:
-            for data_key in OBJ_NAMES:
-                if data_key in task_doc["calcs_reversed"][0]:
-                    big_data_to_store[data_key] = extract_from_calcs_reversed(data_key)
+            for dir_key in OBJ_NAMES:
+                if dir_key in task_doc["calcs_reversed"][0]:
+                    big_data_to_store[dir_key] = extract_from_calcs_reversed(dir_key)
 
         # insert the task documentdocument
         t_id = self.insert(task_doc)
@@ -170,17 +170,18 @@ class openmxCalcDb(CalcDb):
                         compression_type="zlib",
                         task_id=t_id
                     )
+                    self.collection.update_one(
+                        {"task_id": t_id},
+                        {"$set": {f"calcs_reversed.0.{dir_key}.{data_key}_compression": compression_type_}},
+                    )
+                    self.collection.update_one(
+                        {"task_id": t_id},
+                        {"$set": {f"calcs_reversed.0.{dir_key}.{data_key}_fs_id": fs_di_}},
+                    )
             else:
                 raise ValueError(f"Unknown data_key {data_key} to store in gridfs")
             
-            self.collection.update_one(
-                {"task_id": t_id},
-                {"$set": {f"calcs_reversed.0.{dir_key}.{data_key}_compression": compression_type_}},
-            )
-            self.collection.update_one(
-                {"task_id": t_id},
-                {"$set": {f"calcs_reversed.0.{dir_key}.{data_key}_fs_id": fs_di_}},
-            )
+
         return t_id
 
     def retrieve_task(self, task_id):
