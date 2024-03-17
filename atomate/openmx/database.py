@@ -348,9 +348,14 @@ class openmxCalcDb(CalcDb):
             The data stored on object storage, typically a dictionary
         """
         m_task = self.collection.find_one({"task_id": task_id}, {"calcs_reversed": 1})
-        path_to_data = f"calcs_reversed.0.{path}.{key}_fs_id"
-        # split the path to the data as the key is a subdocument
+        path_to_data = f"{path}.{key}_fs_id"
         for p in path_to_data.split("."):
+            # if p is a string of an integer then convert it to an integer
+            try:
+                p = int(p)
+            except ValueError:
+                print(f"Could not convert {p} to an integer")
+
             m_task = m_task[p]
         fs_id = m_task
         obj_dict = None
@@ -366,7 +371,7 @@ class openmxCalcDb(CalcDb):
             obj_dict = zlib.decompress(fs.get(fs_id).read())
         return obj_dict
     
-    def get_openmx_output(self, task_id, key):
+    def get_openmx_output(self, task_id, key, path):
         """
         Read the OUT data into a dictionary
 
@@ -375,7 +380,9 @@ class openmxCalcDb(CalcDb):
         Returns:
             dict: the OUT data
         """
-        obj = self.get_data_from_maggma_or_gridfs(task_id, key=key)
+        base_path = "calcs_reversed.0"
+        path = f"{base_path}.{path}"
+        obj = self.get_data_from_maggma_or_gridfs(task_id, key, path)
         return obj
 
     def get_band_structure(self, task_id):
