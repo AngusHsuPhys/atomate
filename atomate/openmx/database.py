@@ -341,14 +341,18 @@ class openmxCalcDb(CalcDb):
 
         return oid, compression_type
 
-    def get_data_from_maggma_or_gridfs(self, task_id, key):
+    def get_data_from_maggma_or_gridfs(self, task_id, key, path):
         """
         look for a task, then the object of type key associated with that task
         Returns:
             The data stored on object storage, typically a dictionary
         """
         m_task = self.collection.find_one({"task_id": task_id}, {"calcs_reversed": 1})
-        fs_id = m_task["calcs_reversed"][0][f"{key}_fs_id"]
+        path_to_data = f"calcs_reversed.0.{path}.{key}_fs_id"
+        # split the path to the data as the key is a subdocument
+        for p in path_to_data.split("."):
+            m_task = m_task[p]
+        fs_id = m_task
         obj_dict = None
         if self._maggma_store_type is not None:
             with self.get_store(f"{key}_fs") as store:
