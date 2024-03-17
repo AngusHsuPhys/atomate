@@ -341,7 +341,7 @@ class openmxCalcDb(CalcDb):
 
         return oid, compression_type
 
-    def get_data_from_maggma_or_gridfs(self, task_id, key, path):
+    def get_data_from_maggma_or_gridfs(self, task_id, key, path, raw_data_collection="raw_data"):
         """
         look for a task, then the object of type key associated with that task
         Returns:
@@ -367,7 +367,7 @@ class openmxCalcDb(CalcDb):
         if obj_dict is not None:
             return obj_dict
         else:
-            fs = gridfs.GridFS(self.db, f"raw_data_{key}_fs")
+            fs = gridfs.GridFS(self.db, f"{raw_data_collection}_fs")
             obj_dict = zlib.decompress(fs.get(fs_id).read())
         return obj_dict
     
