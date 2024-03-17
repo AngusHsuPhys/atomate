@@ -367,7 +367,7 @@ class openmxCalcDb(CalcDb):
         if obj_dict is not None:
             return obj_dict
         else:
-            fs = gridfs.GridFS(self.db, f"{key}_fs")
+            fs = gridfs.GridFS(self.db, f"raw_data_{key}_fs")
             obj_dict = zlib.decompress(fs.get(fs_id).read())
         return obj_dict
     
