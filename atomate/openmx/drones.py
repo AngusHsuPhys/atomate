@@ -274,13 +274,12 @@ class openmxDrone(AbstractDrone):
                         d["deeph"] = json.load(f)
                     #scan the deeph_base_dir for deeph files and update the calcs_reversed with the output of process_out
                     for file_name in os.listdir(deeph_base_dir):
+                        print(f"parse_deeph: {file_name}")
                         # escape info.json file
-                        if file_name != "info.json":
-                            # d["calcs_reversed"][0].update(self.process_out(deeph_base_dir, file_name))
-                            if "deeph_raw" in d["calcs_reversed"][0]:
-                                d["calcs_reversed"][0]["deeph_raw"].update(self.process_out(deeph_base_dir, file_name))
-                            else:
-                                d["calcs_reversed"][0]["deeph_raw"] = self.process_out(deeph_base_dir, file_name)
+                        if "deeph_raw" in d["calcs_reversed"][0]:
+                            d["calcs_reversed"][0]["deeph_raw"].update(self.process_out(deeph_base_dir, file_name))
+                        else:
+                            d["calcs_reversed"][0]["deeph_raw"] = self.process_out(deeph_base_dir, file_name)
                 else:
                     logger.error(f"deeph_base_dir {deeph_base_dir} does not exist")
                     raise ValueError(f"deeph_base_dir {deeph_base_dir} does not exist")
