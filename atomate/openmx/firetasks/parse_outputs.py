@@ -1,4 +1,5 @@
 import json
+import glob
 import os
 import re
 from collections import defaultdict
@@ -46,6 +47,49 @@ __email__ = "ajain@lbl.gov, kmathew@lbl.gov, shyamd@lbl.gov"
 logger = get_logger(__name__)
 
 
+def parse_shift_current_file(calc_dir):
+    # Find file like sc_tensor_kgd_*.dat
+    pattern = os.path.join(calc_dir, "sc_tensor_kgd_*.dat")
+    matches = glob.glob(pattern)
+    if not matches:
+        return None
+
+    path = matches[0]
+    filename = os.path.basename(path)
+
+    # Extract k-grid density from filename
+    kgd_str = filename.split("sc_tensor_kgd_")[-1].replace(".dat", "")
+    try:
+        k_grid_density = float(kgd_str)
+    except ValueError:
+        k_grid_density = None
+
+    # Extract metadata from file header
+    epsilon, fermi_level, kmesh = None, None, None
+    with open(path, "r") as f:
+        for line in f:
+            if line.startswith("# epsilon"):
+                epsilon = float(line.split(":")[1].strip())
+            elif line.startswith("# fermi_level"):
+                fermi_level = float(line.split(":")[1].strip())
+            elif line.startswith("# kmesh"):
+                kmesh = line.split(":")[1].strip()
+
+    # Load full data
+    data = np.loadtxt(path, comments="#")
+    omega = data[:, 0].tolist()
+    tensor_raw = data[:, 1:]
+    tensor = tensor_raw.reshape(-1, 3, 3, 3).tolist()
+
+    return {
+        "source_file": filename,
+        "k_grid_density": k_grid_density,
+        "kmesh": kmesh,
+        "epsilon": epsilon,
+        "fermi_level": fermi_level,
+        "photon_energy": omega,
+        "tensor": tensor
+    }
 
 @explicit_serialize
 class OpenmxToDb(FiretaskBase):
@@ -124,6 +168,16 @@ class OpenmxToDb(FiretaskBase):
         )
         # assimilate (i.e., parse)
         task_doc = drone.assimilate(calc_dir)
+        # Optional: parse shift current file
+        try:
+            shift_current = parse_shift_current_file(calc_dir)
+            if shift_current is not None:
+                task_doc["shift_current"] = shift_current
+                logger.info(f"Shift current tensor parsed and added from {shift_current['source_file']}")
+            else:
+                logger.info("No sc_tensor_kgd_*.dat file found. Skipping shift current parsing.")
+        except Exception as e:
+            logger.warning(f"Failed to parse shift current tensor: {e}")
 
         # Check for additional keys to set based on the fw_spec
         if self.get("fw_spec_field"):

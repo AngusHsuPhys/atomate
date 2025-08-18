@@ -20,12 +20,14 @@ from atomate.openmx.config import (
     OPENMX_DFT_DATA_PATH,
     OPENMX_CMD,
     OPENMX_INPUT_FILE,
-    OPENMX_OUTPUT_FILE
+    OPENMX_OUTPUT_FILE,
+    NUMBER_OF_THREADS,
+    BASH_SCRIPT
 )
 from atomate.openmx.firetasks.glue_tasks import CopyVaspOutputs, pass_vasp_result
 
 from atomate.openmx.firetasks.parse_outputs import OpenmxToDb, OpenmxJsonToDb
-from atomate.openmx.firetasks.run_calc import RunOpenmx, RunDeephPreprocess
+from atomate.openmx.firetasks.run_calc import RunOpenmx, RunDeephPreprocess, RunShiftCurrent
 from atomate.openmx.firetasks.write_inputs import (
     ModifyIncar,
     WriteNormalmodeDisplacedPoscar,
@@ -58,13 +60,15 @@ class OpenmxScfFW(Firework):
         magmoms=None,
         
         openmx_cmd=OPENMX_CMD,
+        nt = ">>nt<<",
         # input_file=OPENMX_INPUT_FILE,
         # output_file=OPENMX_OUTPUT_FILE,
-
+        shift_current_cmd = ">>shift_current_cmd<<",
         db_file=DB_FILE,
 
         run_deeph_preprocess=False,
         deeph_preprocess_cmd=">>deeph_preprocess_cmd<<",
+        
         parents=None,
         parse_resume=True,
         **kwargs,
@@ -105,6 +109,7 @@ class OpenmxScfFW(Firework):
         t.append(
             RunOpenmx(
                 openmx_cmd=openmx_cmd,
+                nt = nt
                 # input_file=input_file,
                 # output_file=output_file,            
             )
@@ -114,6 +119,14 @@ class OpenmxScfFW(Firework):
         if run_deeph_preprocess:
             t.append(RunDeephPreprocess(deeph_preprocess_cmd=deeph_preprocess_cmd))
             parse_deeph = True
+
+        # t.append(SubmitShiftCurrentSlurm(
+        #     bash_script=bash_script,
+        #     wait=True,  # optional
+        #     poll_interval=30  # optional
+        # ))
+
+        t.append(RunShiftCurrent(shift_current_cmd=shift_current_cmd))
 
         t.append(PassCalcLocs(name=name))
 

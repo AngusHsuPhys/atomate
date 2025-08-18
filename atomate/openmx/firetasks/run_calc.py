@@ -3,9 +3,11 @@ This module defines tasks that support running vasp in various ways.
 """
 
 import os
+import re
 import shlex
 import shutil
 import subprocess
+from pathlib import Path
 
 from custodian import Custodian
 from custodian.vasp.handlers import (
@@ -36,12 +38,21 @@ from pymatgen.io.vasp.sets import get_vasprun_outcar
 from atomate.utils.utils import env_chk, get_logger
 from atomate.vasp.config import CUSTODIAN_MAX_ERRORS, HALF_KPOINTS_FIRST_RELAX
 
+import time
 __author__ = "Anubhav Jain <ajain@lbl.gov>"
 __credits__ = "Shyue Ping Ong <ong.sp>"
 
 logger = get_logger(__name__)
 
+# --- tiny helpers (drop these near the top of your module) ---
+DU_PATTERN        = re.compile(r"dUele\s*=\s*([+-]?\d+(?:\.\d+)?(?:[Ee][+-]?\d+)?)")
+CRITERION_PATTERN = re.compile(r"Criterion\s*=\s*([+-]?\d+(?:\.\d+)?(?:[Ee][+-]?\d+)?)")
 
+def _parse_last_float(pattern, text):
+    m = pattern.findall(text)
+    return float(m[-1]) if m else None
+
+'''
 @explicit_serialize
 class RunOpenmx(FiretaskBase):
     """
@@ -54,15 +65,18 @@ class RunOpenmx(FiretaskBase):
     """
 
     required_params = ["openmx_cmd"]
+    optional_params = ["nt"]
     # optional_params = ["openmx_input_file", "openmx_output_file"]
 
     def run_task(self, fw_spec):
+        # print("fw_spec", fw_spec)
         cmd = env_chk(self["openmx_cmd"], fw_spec)
-        cmd += f" openmx.dat > stat"
+        nt = fw_spec["_fw_env"].get("nt", 1)  # Default to 1 thread if 'nt' is not specified
+        full_cmd = f"{cmd} openmx.dat -nt {nt} > stat"
 
-        logger.info(f"Running command: {cmd}")
-        return_code = subprocess.call(cmd, shell=True)
-        logger.info(f"Command {cmd} finished running with returncode: {return_code}")
+        logger.info(f"Running command: {full_cmd}")
+        return_code = subprocess.call(full_cmd, shell=True)
+        logger.info(f"Command {full_cmd} finished running with returncode: {return_code}")
 
         # set the state by checking the output file "stat" and check if "The calculation was normally finished." is in it.
         with open("stat", "r") as f:
@@ -71,7 +85,69 @@ class RunOpenmx(FiretaskBase):
                 return FWAction(stored_data={"state": "successful"})
             else:
                 raise RuntimeError(f"State of the calculation is not successful. Please check the output file 'stat' for more information.")
+'''
 
+
+
+@explicit_serialize
+class RunOpenmx(FiretaskBase):
+    """
+    Execute a command directly (no custodian).
+
+    Required params:
+        openmx_cmd (str): the name of the full executable to run. Supports env_chk.
+    """
+
+    required_params = ["openmx_cmd"]
+    optional_params = ["nt"]
+    def run_task(self, fw_spec):
+        cmd = env_chk(self["openmx_cmd"], fw_spec)
+        nt = fw_spec["_fw_env"].get("nt", 1)  # Default to 1 thread if 'nt' is not specified
+        full_cmd = f"{cmd} openmx.dat -nt {nt} > stat"
+
+        logger.info(f"Running command: {full_cmd}")
+        return_code = subprocess.call(full_cmd, shell=True)
+        logger.info(f"Command {full_cmd} finished running with returncode: {return_code}")
+
+        def fail_and_delete(msg, files=("openmx.scfout", "openmx.out")):
+            """Delete selected OpenMX outputs, then raise."""
+            for fname in files:
+                try:
+                    p = Path(fname)
+                    if p.exists():
+                        p.unlink()
+                        logger.warning(f"Deleted {p.name} due to failure.")
+                except Exception as e:
+                    logger.warning(f"Could not delete {fname}: {e}")
+            raise RuntimeError(msg)
+
+        # --- minimal SCF convergence check ---
+        with open("stat", "r", encoding="utf-8", errors="ignore") as f:
+            text = f.read()
+
+        if "The calculation was normally finished." not in text:
+            fail_and_delete("Run did not finish normally. See 'stat'.")
+    #        raise RuntimeError("Run did not finish normally. See 'stat'.")
+
+        if "The SCF was not fully achieved" in text:
+            fail_and_delete("SCF not fully achieved. See 'stat'.")
+            #       raise RuntimeError("SCF not fully achieved. See 'stat'.")
+
+        du   = _parse_last_float(DU_PATTERN, text)
+        crit = _parse_last_float(CRITERION_PATTERN, text)
+
+        if du is None or crit is None:
+            fail_and_delete("Missing dUele or Criterion in 'stat'.")
+
+#            raise RuntimeError("Missing dUele or Criterion in 'stat'.")
+
+        if du > crit:
+            fail_and_delete(f"SCF not converged: dUele={du:.3e} > Criterion={crit:.3e}.")
+
+#            raise RuntimeError(f"SCF not converged: dUele={du:.3e} > Criterion={crit:.3e}.")
+
+        print("The calculation was normally finished and SCF converged.")
+        return FWAction(stored_data={"state": "successful", "dUele": du, "criterion": crit})
 
 
 @explicit_serialize
@@ -97,6 +173,87 @@ class RunDeephPreprocess(FiretaskBase):
         logger.info(f"Command {cmd} finished running with returncode: {return_code}")
         if return_code != 0:
             raise RuntimeError(f"Deeph Preprocess returned non-zero exit status: {return_code}")
+
+@explicit_serialize
+class RunShiftCurrent(FiretaskBase):
+    """
+    Run calc_shift_current.jl using Julia.
+    Assumes calc_shift_current.jl is located at a fixed path.
+    """
+    required_params = ["shift_current_cmd"]
+
+    def run_task(self, fw_spec):
+        cmd = env_chk(self["shift_current_cmd"], fw_spec)
+        # Construct the shell command
+        logger.info(f"Running command: {cmd}")
+        return_code = subprocess.call(cmd, shell=True)
+        if return_code != 0:
+            raise RuntimeError(f"Shift current calculation failed with return code {return_code}")
+
+
+# @explicit_serialize
+# class SubmitShiftCurrentSlurm(FiretaskBase):
+#     """
+#     Submit a SLURM job to compute shift current using a wrapped bash script.
+
+#     Required params:
+#         bash_script (str): Path to the SLURM bash script (e.g., submit_calc_bash.sh)
+
+#     Optional params:
+#         wait (bool): Whether to wait for the job to finish (default True)
+#         poll_interval (int): Seconds between job status checks
+#     """
+
+#     required_params = ["bash_script"]
+#     optional_params = ["wait", "poll_interval"]
+
+#     def run_task(self, fw_spec):
+#         bash_script = env_chk(self["bash_script"], fw_spec)
+#         wait = self.get("wait", True)
+#         poll_interval = self.get("poll_interval", 30)
+
+#         workdir = os.getcwd()
+#         cmd = f"sbatch {bash_script} {workdir}"
+#         logger.info(f"Submitting SLURM job: {cmd}")
+
+#         # Submit the job
+#         output = subprocess.check_output(cmd, shell=True).decode()
+#         logger.info(f"SLURM submission output: {output.strip()}")
+
+#         # Parse job ID
+#         try:
+#             job_id = int(output.strip().split()[-1])
+#         except Exception as e:
+#             raise RuntimeError(f"Failed to extract job ID from sbatch output: {output}") from e
+
+#         logger.info(f"Submitted SLURM job ID: {job_id}")
+
+#         if wait:
+#             # Wait for job to finish
+#             logger.info(f"Waiting for SLURM job {job_id} to finish...")
+#             while True:
+#                 try:
+#                     status_output = subprocess.check_output(f"squeue -j {job_id}", shell=True).decode()
+#                     if str(job_id) not in status_output:
+#                         logger.info(f"SLURM job {job_id} completed.")
+#                         break
+#                 except subprocess.CalledProcessError:
+#                     # squeue might fail if job is already gone
+#                     break
+#                 time.sleep(poll_interval)
+
+#             # Check job output file
+#             log_file = f"log/chi-{job_id}.out"
+#             error_file = f"log/chi-{job_id}.error"
+#             if os.path.exists(error_file):
+#                 with open(error_file) as ef:
+#                     error_content = ef.read()
+#                     if "ERROR" in error_content or "failed" in error_content.lower():
+#                         raise RuntimeError(f"Shift current SLURM job failed. Check {error_file}")
+#             logger.info(f"Shift current calculation via SLURM job {job_id} completed successfully.")
+
+#         return FWAction()
+
 
 @explicit_serialize
 class RunVaspCustodian(FiretaskBase):
