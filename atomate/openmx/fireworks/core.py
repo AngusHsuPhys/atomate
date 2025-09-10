@@ -27,7 +27,7 @@ from atomate.openmx.config import (
 from atomate.openmx.firetasks.glue_tasks import CopyVaspOutputs, pass_vasp_result
 
 from atomate.openmx.firetasks.parse_outputs import OpenmxToDb, OpenmxJsonToDb
-from atomate.openmx.firetasks.run_calc import RunOpenmx, RunDeephPreprocess, RunShiftCurrent
+from atomate.openmx.firetasks.run_calc import RunOpenmx, RunDeephPreprocess, RunShiftCurrent, RunPermittivity
 from atomate.openmx.firetasks.write_inputs import (
     ModifyIncar,
     WriteNormalmodeDisplacedPoscar,
@@ -64,9 +64,13 @@ class OpenmxScfFW(Firework):
         # input_file=OPENMX_INPUT_FILE,
         # output_file=OPENMX_OUTPUT_FILE,
         shift_current_cmd = ">>shift_current_cmd<<",
+        permittivity_cmd = ">>permittivity_cmd<<",
+
         db_file=DB_FILE,
 
         run_deeph_preprocess=False,
+        run_shift_current = False,
+        run_permittivity = False, 
         deeph_preprocess_cmd=">>deeph_preprocess_cmd<<",
         
         parents=None,
@@ -125,9 +129,11 @@ class OpenmxScfFW(Firework):
         #     wait=True,  # optional
         #     poll_interval=30  # optional
         # ))
-
-        t.append(RunShiftCurrent(shift_current_cmd=shift_current_cmd))
-
+        if run_shift_current:
+            t.append(RunShiftCurrent(shift_current_cmd=shift_current_cmd))
+        if run_permittivity:
+            t.append(RunPermittivity(permittivity_cmd=permittivity_cmd))
+            
         t.append(PassCalcLocs(name=name))
 
         t.append(OpenmxToDb(db_file=db_file, additional_fields={"task_label": name}, parse_deeph=parse_deeph, parse_resume=parse_resume))

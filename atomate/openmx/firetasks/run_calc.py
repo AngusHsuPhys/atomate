@@ -190,6 +190,21 @@ class RunShiftCurrent(FiretaskBase):
         if return_code != 0:
             raise RuntimeError(f"Shift current calculation failed with return code {return_code}")
 
+@explicit_serialize
+class RunPermittivity(FiretaskBase):
+    """
+    Run calc_permittivity.jl using Julia.
+    Assumes calc_permittivity.jl is located at a fixed path.
+    """
+    required_params = ["permittivity_cmd"]
+
+    def run_task(self, fw_spec):
+        cmd = env_chk(self["permittivity_cmd"], fw_spec)
+        # Construct the shell command
+        logger.info(f"Running command: {cmd}")
+        return_code = subprocess.call(cmd, shell=True)
+        if return_code != 0:
+            raise RuntimeError(f"Permittivity calculation failed with return code {return_code}")
 
 # @explicit_serialize
 # class SubmitShiftCurrentSlurm(FiretaskBase):
