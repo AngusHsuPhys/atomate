@@ -150,29 +150,6 @@ class RunOpenmx(FiretaskBase):
         return FWAction(stored_data={"state": "successful", "dUele": du, "criterion": crit})
 
 
-@explicit_serialize
-class RunDeephPreprocess(FiretaskBase):
-    """
-    Execute a command directly (no custodian).
-
-    Required params:
-        cmd (str): the name of the full executable to run. Supports env_chk.
-    Optional params:
-        expand_vars (str): Set to true to expand variable names in the cmd.
-    """
-
-    required_params = ["deeph_preprocess_cmd"]
-    # optional_params = ["openmx_input_file", "openmx_output_file"]
-
-    def run_task(self, fw_spec):
-        cmd = env_chk(self["deeph_preprocess_cmd"], fw_spec)
-        # cmd += f" main `pwd`"
-
-        logger.info(f"Running command: {cmd}")
-        return_code = subprocess.call(cmd, shell=True)
-        logger.info(f"Command {cmd} finished running with returncode: {return_code}")
-        if return_code != 0:
-            raise RuntimeError(f"Deeph Preprocess returned non-zero exit status: {return_code}")
 
 @explicit_serialize
 class RunShiftCurrent(FiretaskBase):
@@ -206,6 +183,47 @@ class RunPermittivity(FiretaskBase):
         if return_code != 0:
             raise RuntimeError(f"Permittivity calculation failed with return code {return_code}")
 
+@explicit_serialize
+class RunirPermittivity(FiretaskBase):
+    """
+    Run calc_ir_permittivity.jl using Julia.
+    Assumes calc_permittivity.jl is located at a fixed path.
+    """
+    required_params = ["ir_permittivity_cmd"]
+
+    def run_task(self, fw_spec):
+        cmd = env_chk(self["ir_permittivity_cmd"], fw_spec)
+        # Construct the shell command
+        logger.info(f"Running command: {cmd}")
+        return_code = subprocess.call(cmd, shell=True)
+        if return_code != 0:
+            raise RuntimeError(f"ir Permittivity calculation failed with return code {return_code}")
+
+
+@explicit_serialize
+class RunDeephPreprocess(FiretaskBase):
+    """
+    Execute a command directly (no custodian).
+
+    Required params:
+        cmd (str): the name of the full executable to run. Supports env_chk.
+    Optional params:
+        expand_vars (str): Set to true to expand variable names in the cmd.
+    """
+
+    required_params = ["deeph_preprocess_cmd"]
+    # optional_params = ["openmx_input_file", "openmx_output_file"]
+
+    def run_task(self, fw_spec):
+        cmd = env_chk(self["deeph_preprocess_cmd"], fw_spec)
+        # cmd += f" main `pwd`"
+
+        logger.info(f"Running command: {cmd}")
+        return_code = subprocess.call(cmd, shell=True)
+        logger.info(f"Command {cmd} finished running with returncode: {return_code}")
+        if return_code != 0:
+            raise RuntimeError(f"Deeph Preprocess returned non-zero exit status: {return_code}")
+        
 # @explicit_serialize
 # class SubmitShiftCurrentSlurm(FiretaskBase):
 #     """

@@ -140,6 +140,56 @@ def parse_permittivity_file(calc_dir):
         "photon_energy": omega,
         "tensor": tensor  # shape (Nω, 3, 3, 2)
     }
+def parse_ir_permittivity_file(calc_dir):
+    # Find file like sc_tensor_kgd_*.dat
+    pattern = os.path.join(calc_dir, "ir_permittivity_*.dat")
+    matches = glob.glob(pattern)
+    if not matches:
+        return None
+
+    path = matches[0]
+    filename = os.path.basename(path)
+
+    # Extract k-grid density from filename
+    kgd_str = filename.split("ir_permittivity_")[-1].replace(".dat", "")
+    try:
+        k_grid_density = float(kgd_str)
+    except ValueError:
+        k_grid_density = None
+
+    # Extract metadata from file header
+    epsilon, fermi_level, kmesh = None, None, None
+    with open(path, "r") as f:
+        for line in f:
+            if line.startswith("# epsilon"):
+                epsilon = float(line.split(":")[1].strip())
+            elif line.startswith("# fermi_level"):
+                fermi_level = float(line.split(":")[1].strip())
+            elif line.startswith("# kmesh"):
+                kmesh = line.split(":")[1].strip()
+
+    # Load full data
+    data = np.loadtxt(path, comments="#")
+    omega = data[:, 0].tolist()
+    tensor_raw = data[:, 1:]
+    try:
+        tensor = tensor_raw.reshape(-1, 3, 3, 2).tolist()
+    except ValueError:
+        raise ValueError(
+            f"Unexpected tensor shape in {filename}. "
+            f"Expected (Nω, 18) real+imag pairs for 3×3 tensor."
+        )
+
+    return {
+        "source_file": filename,
+        "k_grid_density": k_grid_density,
+        "kmesh": kmesh,
+        "epsilon": epsilon,
+        "fermi_level": fermi_level,
+        "photon_energy": omega,
+        "tensor": tensor  # shape (Nω, 3, 3, 2)
+    }
+
 @explicit_serialize
 class OpenmxToDb(FiretaskBase):
     """
@@ -237,6 +287,19 @@ class OpenmxToDb(FiretaskBase):
                 logger.info(f"Permittivity tensor parsed and added from {permittivity['source_file']}")
             else:
                 logger.info("No permittivity_kgd_*.dat file found. Skipping permittivity parsing.")
+        except Exception as e:
+            logger.warning(f"Failed to parse permittivity tensor: {e}")
+
+
+        task_doc = drone.assimilate(calc_dir)
+        # Optional: parse ir-permittivity file
+        try:
+            permittivity = parse_ir_permittivity_file(calc_dir)
+            if permittivity is not None:
+                task_doc["ir_permittivity"] = permittivity
+                logger.info(f"ir Permittivity tensor parsed and added from {permittivity['source_file']}")
+            else:
+                logger.info("No ir_permittivity_kgd_*.dat file found. Skipping permittivity parsing.")
         except Exception as e:
             logger.warning(f"Failed to parse permittivity tensor: {e}")
 

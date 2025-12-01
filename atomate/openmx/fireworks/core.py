@@ -27,7 +27,7 @@ from atomate.openmx.config import (
 from atomate.openmx.firetasks.glue_tasks import CopyVaspOutputs, pass_vasp_result
 
 from atomate.openmx.firetasks.parse_outputs import OpenmxToDb, OpenmxJsonToDb
-from atomate.openmx.firetasks.run_calc import RunOpenmx, RunDeephPreprocess, RunShiftCurrent, RunPermittivity
+from atomate.openmx.firetasks.run_calc import RunOpenmx, RunDeephPreprocess, RunShiftCurrent, RunPermittivity, RunirPermittivity
 from atomate.openmx.firetasks.write_inputs import (
     ModifyIncar,
     WriteNormalmodeDisplacedPoscar,
@@ -65,12 +65,16 @@ class OpenmxScfFW(Firework):
         # output_file=OPENMX_OUTPUT_FILE,
         shift_current_cmd = ">>shift_current_cmd<<",
         permittivity_cmd = ">>permittivity_cmd<<",
+        ir_permittivity_cmd = ">>ir_permittivity_cmd<<",
+
 
         db_file=DB_FILE,
 
         run_deeph_preprocess=False,
         run_shift_current = False,
         run_permittivity = False, 
+        run_ir_permittivity = False, 
+
         deeph_preprocess_cmd=">>deeph_preprocess_cmd<<",
         
         parents=None,
@@ -119,11 +123,6 @@ class OpenmxScfFW(Firework):
             )
         )
 
-        parse_deeph = False
-        if run_deeph_preprocess:
-            t.append(RunDeephPreprocess(deeph_preprocess_cmd=deeph_preprocess_cmd))
-            parse_deeph = True
-
         # t.append(SubmitShiftCurrentSlurm(
         #     bash_script=bash_script,
         #     wait=True,  # optional
@@ -131,9 +130,18 @@ class OpenmxScfFW(Firework):
         # ))
         if run_shift_current:
             t.append(RunShiftCurrent(shift_current_cmd=shift_current_cmd))
+            
         if run_permittivity:
             t.append(RunPermittivity(permittivity_cmd=permittivity_cmd))
             
+        if run_ir_permittivity:
+            t.append(RunirPermittivity(ir_permittivity_cmd=ir_permittivity_cmd))     
+             
+        parse_deeph = False
+        if run_deeph_preprocess:
+            t.append(RunDeephPreprocess(deeph_preprocess_cmd=deeph_preprocess_cmd))
+            parse_deeph = True
+
         t.append(PassCalcLocs(name=name))
 
         t.append(OpenmxToDb(db_file=db_file, additional_fields={"task_label": name}, parse_deeph=parse_deeph, parse_resume=parse_resume))
